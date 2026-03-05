@@ -12,23 +12,23 @@ export default function Home() {
       severity: 'success',
       summary: 'Success',
       detail: 'Toast is working!',
-      life: 30000,
+      life: 30000, 
     });
   };
 
   return (
     <>
-      <Toast ref={toast} />
+      {/* <Toast ref={toast} /> */}
 
-      <div className="page bg-red-400 flex-start">
+      <div className="page flex-start">
         <main className='w-full flex-space-between'>
-          <header className="text-xl font-bold">
+          {/* <header className="text-xl font-bold">
             Welcome to Renaisance Park / Vespera Project hahaha,dmfgvbhfgbasljfgsahahaha
           </header>
 
           <div className="flex-col-center w-full border flex-right">
             <Button onClick={show} label="Test Toast" />
-          </div>
+          </div> */}
         </main>
       </div>
     </>
