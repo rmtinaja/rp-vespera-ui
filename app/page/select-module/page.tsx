@@ -2,12 +2,12 @@
 
 import { useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { CheckCheck, CheckCircle2 } from "lucide-react"
+import { CheckCircle2 } from "lucide-react"
 
 export default function Dashboard(){
     const router = useRouter()
     const selectModule = () => {
-        router.push("/role-template");
+        router.push("dashboard");
     }
     useEffect(()=>{
         const token = localStorage.getItem("token")

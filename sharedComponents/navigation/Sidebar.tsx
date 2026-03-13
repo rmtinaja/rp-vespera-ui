@@ -3,40 +3,47 @@
 import Link from "next/link"
 import { useNavigation } from "./NavigationProvider"
 
-export default function Sidebar(){
+export default function Sidebar() {
 
-    const {modules} = useNavigation()
+  const { modules, loading } = useNavigation()
 
-    return(
+  if (loading) {
+    return <div className="p-4">Loading navigation...</div>
+  }
 
-        <div className="sidebar">
+  return (
 
-            {modules.map((module:any)=>(
+    <div className="sidebar p-4 w-64 bg-gray-100">
 
-                <div key={module.id}>
+      {modules.map((module) => (
 
-                    <h3 className="font-semibold">
-                        {module.module_name}
-                    </h3>
+        <div key={module.id} className="mb-4">
 
-                    {module.submodules.map((sub:any)=>(
+          <h3 className="font-semibold text-gray-700">
+            {module.module_name}
+          </h3>
 
-                        <Link
-                            key={sub.id}
-                            href={sub.route}
-                            className="block pl-3 py-1"
-                        >
-                            {sub.submodule_name}
-                        </Link>
+          <div className="mt-2">
 
-                    ))}
+            {module.submodules.map((sub) => (
 
-                </div>
+              <Link
+                key={sub.id}
+                href={sub.route}
+                className="block pl-3 py-1 text-sm hover:text-blue-600"
+              >
+                {sub.submodule_name}
+              </Link>
 
             ))}
 
+          </div>
+
         </div>
 
-    )
+      ))}
 
+    </div>
+
+  )
 }

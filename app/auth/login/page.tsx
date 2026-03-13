@@ -1,5 +1,5 @@
 'use client'
-
+import Link from "next/link"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { LockIcon, User2Icon } from "lucide-react"
@@ -13,19 +13,28 @@ export default function LoginComponent(){
     const [password,setPassword] = useState("")
     const [loading,setLoading] = useState(false)
 
-    const handleLogin = async (e:React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault()
+
         try{
             setLoading(true)
+
             const res = await AuthService.login({
                 username,
                 password
             })
+
             if(res.success){
-                router.push("/select-module")
+
+                // Save token to cookie
+                document.cookie = `token=${res.token}; path=/`
+
+                router.push("/page/select-module")
+
             }else{
                 alert(res.message)
             }
+
         }catch(error:any){
             alert(error.response?.data?.message || "Login failed")
         }finally{
@@ -91,9 +100,9 @@ export default function LoginComponent(){
                                 {loading ? "Logging in..." : "Login"}
                             </button>
 
-                            <a href="/auth/register">
+                            <Link href="/auth/register">
                                 Create New Account
-                            </a>
+                            </Link>
 
                         </div>
 
