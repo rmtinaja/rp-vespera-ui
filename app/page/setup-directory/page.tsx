@@ -1,34 +1,76 @@
-export default function RoleTemplateComponent(){
+"use client";
+
+import { useState } from "react";
+import ModalComponent from "@/sharedComponents/ModalComponent";
+
+export default function RoleTemplateComponent() {
+
+    const [isModalOpen, setIsModalOpen] = useState(false);
+
     return(
         <>
-            <div className="page p-3 flex flex-col gap-3">
-                <div className="w-full p-2 px-5 bg-secondary-rp rounded-xl flex flex-row items-center justify-between">
-                    <header className=" text-white font-semibold">Role Template Assignment</header>
-                    <button className="bg-accent-rp text-white text-sm">New Role Template</button>
-                </div>
-                <div className="h-full flex flex-row gap-3">
-                    <div className="page-content bg-accent-rp !w-1/5 rounded-xl p-6 text-white flex flex-col">
-                        <div className="font-semibold text-xl font-nunito">
-                            <header className="">Role Task Template </header>
-                            <span>Assignment</span>
-                        </div>
-                    </div>
-                    <div className="page-content bg-accent-rp !w-3/5 rounded-xl p-6 text-white flex flex-col">
-                        <div className="font-semibold text-xl font-nunito">
-                            <header className="">Module Assignment</header>
-                        </div>
-                    </div>
-                    <div className="page-content !w-1/5 text-white flex flex-col gap-4">
-                        <div className="font-semibold text-xl font-nunito bg-accent-rp rounded-xl p-6">
-                            <header className="">Sub Module</header>
-                            <span>Assignment</span>
-                        </div>
-                        <div className="font-semibold text-xl font-nunito bg-accent-rp rounded-xl p-6">
-                            <header className="">Access Type</header>
-                        </div>
-                    </div>
-                </div>
+            <div className="flex justify-between items-center flex-row border-b-2 pb-2">
+                <header className="font-semibold">
+                    Create Role Template Creation
+                </header>
+                <button className="bg-accent-rp px-3 py-1 rounded" onClick={() => setIsModalOpen(true)} >
+                    New Role Template
+                </button>
             </div>
+            <table className="w-full mt-4">
+                <thead className="bg-accent-rp">
+                    <tr className="py-3">
+                        <td className="py-3 px-3 w-1/8 rounded-tl-2xl">No.</td>
+                        <td className="w-3/8">Role Template</td>
+                        <td className="w-3/8">Access Module</td>
+                        <td className="w-1/8 rounded-tr-2xl text-center pr-3">Actions</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr className="bg-primary-rp hover:bg-[#ecececbe]! duration-500">
+                        <td className="py-2 px-2">1</td>
+                        <td>Human Resource</td>
+                        <td>HR Module, Contracts</td>
+                        <td className="text-center pr-3">
+                            <button className="rounded-xl bg-secondary-rp w-full p-[2px]! text-white">
+                                View
+                            </button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <ModalComponent isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="Create Role Template">
+                <form className="space-y-4">
+                    <div>
+                        <label className="text-sm font-medium">
+                            Role Template Name
+                        </label>
+                        <input
+                            type="text"
+                            className="w-full border rounded p-2"
+                            placeholder="Enter role template name"
+                        />
+                    </div>
+                    <div>
+                        <label className="text-sm font-medium">
+                            Description
+                        </label>
+                        <textarea
+                            className="w-full border rounded p-2"
+                            placeholder="Optional description"
+                        />
+                    </div>
+                    <div className="flex justify-end gap-2 mt-4">
+                        <button type="button" className="px-4 py-2 border rounded" onClick={() => setIsModalOpen(false)}>
+                            Cancel
+                        </button>
+                        <button type="submit" className="bg-secondary-rp text-white px-4 py-2 rounded">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </ModalComponent>
         </>
-    )
+    );
 }

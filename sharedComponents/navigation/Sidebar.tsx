@@ -13,13 +13,13 @@ export default function Sidebar() {
 
   return (
 
-    <div className="sidebar p-4 w-64 bg-gray-100">
+    <div className="sidebar p-4 w-64 bg-accent-rp text-white rounded-md">
 
       {modules.map((module) => (
 
         <div key={module.id} className="mb-4">
 
-          <h3 className="font-semibold text-gray-700">
+          <h3 className="font-semibold">
             {module.module_name}
           </h3>
 
@@ -30,7 +30,7 @@ export default function Sidebar() {
               <Link
                 key={sub.id}
                 href={sub.route}
-                className="block pl-3 py-1 text-sm hover:text-blue-600"
+                className="block pl-3 py-2 text-sm hover:bg-[#B18343] duration-200 rounded-md"
               >
                 {sub.submodule_name}
               </Link>

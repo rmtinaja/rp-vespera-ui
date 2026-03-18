@@ -7,20 +7,13 @@ export default function PageLayout({
   children: React.ReactNode
 }) {
   return (
-
     <NavigationProvider>
-
-      <div className="flex min-h-screen">
-
+      <div className="flex min-h-screen p-2">
         <Sidebar />
-
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 h-full">
           {children}
         </main>
-
       </div>
-
     </NavigationProvider>
-
   )
 }

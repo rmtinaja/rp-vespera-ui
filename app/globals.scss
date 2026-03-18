@@ -20,7 +20,7 @@
 }
 .app-layout {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
 }
 
 .app-content {
@@ -126,6 +126,7 @@ button{
 //RP branding
 .bg-accent-rp{ 
   background-color: #0A352D;
+  color:#fff;
 }
 .bg-secondary-rp{
   background-color: #B18343;
