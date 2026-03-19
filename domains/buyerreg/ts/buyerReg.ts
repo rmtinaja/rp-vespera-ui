@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { LocationService } from "@/domains/pa/Services/BuyerRegService";
+import { LocationService } from "@/sharedComponents/services/LocationService";
 import { LocationModel } from "@/domains/pa/Model/BuyerRegModel";
 import { ApiService } from "@/domains/pa/Services/ApiService";
 import { SendOtpModel } from "@/domains/pa/Model/sendOtpModel";

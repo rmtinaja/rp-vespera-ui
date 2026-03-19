@@ -1,53 +1,70 @@
 import { Button } from "primereact/button";
-import { ApiService } from "@/domains/pa/Services/ApiService";
-import { useState, useRef, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { ApiService } from "../../Services/ApiService";
+import { SendOtpDTO } from "../../DTO/BuyerRegDTO";
 
-interface Step1Props {
-  form: any;
-  handleChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
-  nextStep: () => void;
-  sendOTP: () => void;
-  otpTimer: number;
-}
+export default function Step1({ nextStep }: { nextStep: () => void }) {
+  const [form, setForm] = useState({
+    firstName: (sessionStorage.getItem("firstName") || "").toUpperCase(),
+    middleName: (sessionStorage.getItem("middleName") || "").toUpperCase(),
+    lastName: (sessionStorage.getItem("lastName") || "").toUpperCase(),
+    mobile: sessionStorage.getItem("mobile") || "",
+  });
 
-export default function Step1({
-  form,
-  handleChange,
-  sendOTP,
-  otpTimer,
-}: Step1Props) {
+  const [otpTimer, setOtpTimer] = useState(0);
   const [loading, setLoading] = useState(false);
   const [mobileError, setMobileError] = useState("");
-  const [checkingMobile, setCheckingMobile] = useState(false);
 
-  const api = new ApiService();
-  let mobileTimeout: NodeJS.Timeout;
-  
-  useEffect(() => {
-    if (!form.mobile) {
-      setMobileError("");
-      return;
+  const apiService = new ApiService();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const updatedForm = { ...form, [name]: value };
+    setForm(updatedForm);
+
+    // Save inputs to session immediately
+    sessionStorage.setItem(name, value);
+  };
+
+  const sendOTP = async () => {
+    setLoading(true);
+    setMobileError("");
+
+    try {
+      const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+      const dto: SendOtpDTO = {
+        phone: form.mobile,
+        fname: form.firstName,
+        mname: form.middleName || null,
+        lname: form.lastName,
+        module: "PA",
+        otp,
+        message: `Your OTP is ${otp}. It will expire in 5 minutes.`,
+      };
+
+      await apiService.sendOtp(dto);
+
+      // Save OTP to session
+      // sessionStorage.setItem("otp", otp);
+
+      // Start 5-min timer
+      setOtpTimer(300);
+
+      // Move to next step
+      nextStep();
+    } catch (err: any) {
+      setMobileError(err.message);
+    } finally {
+      setLoading(false);
     }
+  };
 
-    clearTimeout(mobileTimeout);
-    mobileTimeout = setTimeout(async () => {
-      setCheckingMobile(true);
-      try {
-        const result = await api.checkMobileUnique({
-          mobile: form.mobile,
-        });
-        if (!result.isUnique) setMobileError(result.message);
-        else setMobileError("");
-      } catch (error: any) {
-        setMobileError("Your mobile number is invalid.");
-      }
-      setCheckingMobile(false);
-    }, 500);
-
-    return () => clearTimeout(mobileTimeout);
-  }, [form.mobile]);
+  useEffect(() => {
+    if (otpTimer <= 0) return;
+    const interval = setInterval(() => setOtpTimer((prev) => prev - 1), 1000);
+    return () => clearInterval(interval);
+  }, [otpTimer]);
 
   return (
     <div className="space-y-4">
@@ -65,7 +82,7 @@ export default function Step1({
           value={form.firstName}
           onChange={handleChange}
           placeholder="First Name"
-          className="bg-white w-full rounded-lg px-3 py-2"
+          className="bg-white w-full rounded-lg px-3 py-2 uppercase"
         />
       </div>
 
@@ -81,7 +98,7 @@ export default function Step1({
           value={form.middleName}
           onChange={handleChange}
           placeholder="Middle Name"
-          className="bg-white w-full rounded-lg px-3 py-2"
+          className="bg-white w-full rounded-lg px-3 py-2 uppercase"
         />
       </div>
 
@@ -97,7 +114,7 @@ export default function Step1({
           value={form.lastName}
           onChange={handleChange}
           placeholder="Last Name"
-          className="bg-white w-full rounded-lg px-3 py-2"
+          className="bg-white w-full rounded-lg px-3 py-2 uppercase"
         />
       </div>
 
@@ -113,22 +130,24 @@ export default function Step1({
           value={form.mobile}
           onChange={handleChange}
           placeholder="Mobile"
+          minLength={11}
+          maxLength={11}
           className={`bg-white mt-1 w-full rounded-lg border px-3 py-2 focus:ring-green-500 focus:border-green-500
-            ${mobileError ? "border-red-500" : "border-gray-300"}`}
+    ${mobileError ? "border-red-500" : "border-gray-300"}`}
         />
-          {checkingMobile && (
-          <span className="text-xs text-gray-500 mt-1">Checking mobile...</span>
-        )}
-        {mobileError && (
-          <span className="text-xs text-red-500 mt-1">{mobileError}</span>
-        )}
       </div>
 
       {/* Send OTP */}
       <Button
         type="button"
         onClick={sendOTP}
-        disabled={otpTimer > 0 || loading || !!mobileError}
+        disabled={
+          otpTimer > 0 ||
+          loading ||
+          !form.mobile ||
+          !form.firstName ||
+          !form.lastName
+        }
       >
         {otpTimer > 0
           ? `Resend in ${Math.floor(otpTimer / 60)}:${String(

@@ -1,20 +1,46 @@
 import { Button } from "primereact/button";
+import { useState } from "react";
 
-interface Step2Props {
-  form: any;
-  handleChange: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-  ) => void;
+interface Step3Props {
   nextStep: () => void;
-  loading: boolean;
 }
 
-export default function Step3({
-  form,
-  handleChange,
-  nextStep,
-  loading,
-}: Step2Props) {
+export default function Step3({ nextStep }: Step3Props) {
+  // Initialize form from sessionStorage
+  const [form, setForm] = useState({
+    gender: sessionStorage.getItem("gender") || "",
+    birthDate: sessionStorage.getItem("birthDate") || "",
+    civilStatus: sessionStorage.getItem("civilStatus") || "",
+  });
+
+  const [loading, setLoading] = useState(false);
+
+  // Handle input and select changes
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    const updatedForm = { ...form, [name]: value };
+    setForm(updatedForm);
+
+    // Save to sessionStorage immediately
+    sessionStorage.setItem(name, value);
+  };
+
+  // Validate before moving to next step
+  const handleNext = () => {
+    if (!form.gender || !form.birthDate || !form.civilStatus) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    setLoading(true);
+    setTimeout(() => {
+      setLoading(false);
+      nextStep();
+    }, 500); // simulate async operation
+  };
+
   return (
     <div className="step2-form space-y-6 p-4">
       <h2 className="text-lg font-semibold text-gray-700">
@@ -80,12 +106,13 @@ export default function Step3({
         </span>
       </div>
 
+      {/* Next Button */}
       <div className="mt-4">
         <Button
           className="w-full justify-center sm:w-1/2 text-white rounded-lg"
           icon="pi pi-check"
           loading={loading}
-          onClick={nextStep}
+          onClick={handleNext}
         >
           Next
         </Button>
