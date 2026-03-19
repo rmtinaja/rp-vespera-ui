@@ -1,26 +1,94 @@
+import { useState, useEffect } from "react";
 import { Button } from "primereact/button";
+import { ApiService } from "../../Services/ApiService";
+import { VerifyIdDTO } from "../../DTO/BuyerRegDTO";
 
 interface Step5Props {
-  form: any;
-  preview: string | null;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  backstep2: () => void;
-  verifyCard: () => void;
-  setLoading: (loading: boolean) => void;
-  loading: boolean;
+  nextStep: () => void;
+  backStep: () => void;
 }
 
-export default function Step5({
-  form,
-  preview,
-  handleChange,
-  backstep2,
-  verifyCard,
-  setLoading,
-  loading,
-}: Step5Props) {
+export default function Step5({ backStep, nextStep }: Step5Props) {
+  const [form, setForm] = useState<{ govId: File | null }>({ govId: null });
+  const [preview, setPreview] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [sessionData, setSessionData] = useState<any>({});
+  const apiService = new ApiService();
+  // Generate preview when file changes
+
+  useEffect(() => {
+    const data = {
+      firstName: sessionStorage.getItem("firstName") || "",
+      middleName: sessionStorage.getItem("middleName") || "",
+      lastName: sessionStorage.getItem("lastName") || "",
+      province: sessionStorage.getItem("province") || "",
+      provinceName: sessionStorage.getItem("provinceName") || "",
+      city: sessionStorage.getItem("city") || "",
+      cityName: sessionStorage.getItem("cityName") || "",
+      barangay: sessionStorage.getItem("barangay") || "",
+      barangayName: sessionStorage.getItem("barangayName") || "",
+    };
+    setSessionData(data);
+  }, []);
+  useEffect(() => {
+    if (form.govId) {
+      const reader = new FileReader();
+      reader.onloadend = () => setPreview(reader.result as string);
+      reader.readAsDataURL(form.govId);
+    } else {
+      setPreview(null);
+    }
+  }, [form.govId]);
+
+  // Handle file selection
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+
+    const file = e.target.files[0];
+
+    if (!["image/jpeg", "image/png"].includes(file.type)) {
+      alert("Only JPG or PNG files are allowed.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      alert("File size must be less than 5MB.");
+      return;
+    }
+
+    setForm({ govId: file });
+    sessionStorage.setItem("govIdName", file.name);
+  };
+
+  // Handle verification
+  const handleVerify = async () => {
+    if (!form.govId) return;
+
+    setLoading(true);
+    try {
+      const dto: VerifyIdDTO = {
+        gov_id: form.govId,
+        fname: sessionData.firstName,
+        mname: sessionData.middleName || null,
+        lname: sessionData.lastName,
+        province: sessionData.province,
+        city: sessionData.city,
+        barangay: sessionData.barangay,
+      };
+
+      const result = await apiService.verifyId(dto);
+      console.log("Verification success:", result);
+      alert("ID verified successfully!");
+      nextStep();
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Verification failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div id="step3" className="space-y-4">
+    <div id="step5" className="space-y-4">
       <h2 className="text-lg font-semibold text-gray-700">
         Upload Government ID
       </h2>
@@ -34,11 +102,8 @@ export default function Step5({
         <label className="block text-sm font-medium text-gray-700">
           ID Upload <span className="text-red-500">*</span>
         </label>
-
         <input
           type="file"
-          id="govId"
-          name="govId"
           accept="image/jpeg,image/png"
           onChange={handleChange}
           className="bg-white mt-1 w-full rounded-lg border-gray-300 px-3 py-2"
@@ -67,8 +132,8 @@ export default function Step5({
         <div className="flex gap-2 pt-4">
           <button
             type="button"
-            onClick={backstep2}
-            className="w-1/2 py-2 bg-accent text-white rounded-lg"
+            onClick={backStep}
+            className="w-1/2 py-2 bg-gray-500 text-white rounded-lg"
           >
             Back
           </button>
@@ -76,17 +141,13 @@ export default function Step5({
           <Button
             icon="pi pi-check"
             loading={loading}
-            onClick={async () => {
-              setLoading(true);
-              try {
-                await verifyCard();
-              } finally {
-                setLoading(false);
-              }
-            }}
-            className={`w-1/2 py-2 rounded-lg justify-center  text-white transition-colors duration-200
-    ${form.govId ? "bg-green-600 hover:bg-green-700" : "bg-green-300 cursor-not-allowed"}`}
-            disabled={!form.govId}
+            onClick={handleVerify}
+            className={`w-1/2 py-2 rounded-lg justify-center text-white transition-colors duration-200 ${
+              form.govId
+                ? "bg-green-600 hover:bg-green-700"
+                : "bg-green-300 cursor-not-allowed"
+            }`}
+            disabled={!form.govId || loading}
           >
             Verify
           </Button>
