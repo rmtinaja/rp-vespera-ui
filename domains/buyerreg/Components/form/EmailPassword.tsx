@@ -5,30 +5,35 @@ import { Button } from "primereact/button";
 import { Eye, EyeOff } from "lucide-react";
 
 interface Step6Props {
-  form: any;
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  nextStep5: () => void;
-  nextStep3: () => void; // back button
-  loading?: boolean;
-  setLoading: (loading: boolean) => void;
+  nextStep: () => void;
+  backStep: () => void;
 }
 
-export default function Step6({
-  form,
-  handleChange,
-  nextStep5,
-  nextStep3,
-  setLoading,
-  loading = false,
-}: Step6Props) {
+
+export default function Step6({ nextStep, backStep }: Step6Props) {
+  const [form, setForm] = useState({
+    email: (sessionStorage.getItem("email") || ""),
+    passwordConfirmation: (sessionStorage.getItem("passwordConfirmation") || ""),
+    password: (sessionStorage.getItem("password") || ""),
+  });
+
   const [emailError, setEmailError] = useState("");
   const [checkingEmail, setCheckingEmail] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const api = new ApiService();
+  const [loading, setLoading] = useState(false);
   let emailTimeout: NodeJS.Timeout;
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    const updatedForm = { ...form, [name]: value };
+    setForm(updatedForm);
+
+    // Save inputs to session immediately
+    sessionStorage.setItem(name, value);
+  };
   // Debounced email uniqueness check
   useEffect(() => {
     if (!form.email) {
@@ -58,12 +63,12 @@ export default function Step6({
   useEffect(() => {
     if (form.password && form.password.length < 8) {
       setPasswordError("Password must be at least 8 characters.");
-    } else if (form.password !== form.password_confirmation) {
+    } else if (form.password !== form.passwordConfirmation) {
       setPasswordError("Passwords do not match.");
     } else {
       setPasswordError("");
     }
-  }, [form.password, form.password_confirmation]);
+  }, [form.password, form.passwordConfirmation]);
 
   // Disable Next if errors exist
   const isNextDisabled =
@@ -71,7 +76,7 @@ export default function Step6({
     !!emailError ||
     !!passwordError ||
     form.password === "" ||
-    form.password_confirmation === "";
+    form.passwordConfirmation === "";
 
   return (
     <div id="step2" className="space-y-4">
@@ -134,9 +139,9 @@ export default function Step6({
           <div className="flex mt-1 relative">
             <input
               type={showConfirmPassword ? "text" : "password"}
-              name="password_confirmation"
+              name="passwordConfirmation"
               onChange={handleChange}
-              value={form.password_confirmation}
+              value={form.passwordConfirmation}
               placeholder="Re-enter password"
               className={`flex-1 bg-white rounded-lg border border-gray-300 px-3 py-2 pr-10 focus:ring-green-500 focus:border-green-500
                 ${passwordError ? "border-red-500" : "border-gray-300"}`}
@@ -162,7 +167,7 @@ export default function Step6({
           onClick={async () => {
             setLoading(true);
             try {
-              await nextStep3();
+              await backStep();
             } finally {
               setLoading(false);
             }
@@ -175,7 +180,7 @@ export default function Step6({
           icon="pi pi-check"
           loading={loading}
           className="btn-primary justify-center w-1/2 py-2 rounded-lg text-white bg-accent"
-          onClick={nextStep5}
+          onClick={nextStep}
           disabled={isNextDisabled}
         >
           Next

@@ -5,10 +5,10 @@ import { SendOtpDTO } from "../../DTO/BuyerRegDTO";
 
 export default function Step1({ nextStep }: { nextStep: () => void }) {
   const [form, setForm] = useState({
-    firstName: (sessionStorage.getItem("firstName") || "").toUpperCase(),
-    middleName: (sessionStorage.getItem("middleName") || "").toUpperCase(),
-    lastName: (sessionStorage.getItem("lastName") || "").toUpperCase(),
-    mobile: sessionStorage.getItem("mobile") || "",
+    firstName: "",
+    middleName: "",
+    lastName: "",
+    mobile: "",
   });
 
   const [otpTimer, setOtpTimer] = useState(0);
@@ -65,7 +65,19 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
     const interval = setInterval(() => setOtpTimer((prev) => prev - 1), 1000);
     return () => clearInterval(interval);
   }, [otpTimer]);
+  useEffect(() => {
+    const firstName = sessionStorage.getItem("firstName") || "";
+    const middleName = sessionStorage.getItem("middleName") || "";
+    const lastName = sessionStorage.getItem("lastName") || "";
+    const mobile = sessionStorage.getItem("mobile") || "";
 
+    setForm({
+      firstName: firstName.toUpperCase(),
+      middleName: middleName.toUpperCase(),
+      lastName: lastName.toUpperCase(),
+      mobile,
+    });
+  }, []);
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-gray-700">Basic Information</h2>
@@ -151,8 +163,8 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
       >
         {otpTimer > 0
           ? `Resend in ${Math.floor(otpTimer / 60)}:${String(
-              otpTimer % 60,
-            ).padStart(2, "0")}`
+            otpTimer % 60,
+          ).padStart(2, "0")}`
           : loading
             ? "Checking..."
             : "Send OTP"}
