@@ -33,7 +33,7 @@ export default function Section5() {
         },
     ];
 
-    const imageTemplate = (item) => {
+    const imageTemplate = (item : any) => {
         return (
             <div className="flex justify-center items-center p-4">
                 <div className="relative w-full max-w-md mx-auto rounded-lg shadow-2xl overflow-hidden">
