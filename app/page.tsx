@@ -1,5 +1,7 @@
-import { redirect } from "next/navigation"
+import HeroPage from "./website/page";
 
 export default function Home() {
-  redirect("/auth/login")
+  return (
+    <HeroPage/>
+  );
 }

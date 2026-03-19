@@ -1,0 +1,356 @@
+@import "primereact/resources/themes/lara-light-blue/theme.css";
+@import "primereact/resources/primereact.min.css";
+.bgPrimary {
+  background-color: #f7f3ed;
+}
+
+.bgSecondary {
+  background: linear-gradient(135deg, #b18343, #d9a066);
+}
+
+.bgAccent {
+  background-color: #0a352d !important;
+  transition: all 0.3s ease;
+  
+}
+
+.section1 {
+height: calc(100vh - 75.98px);
+  background-image: url(/assets/images/hero.avif);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+.footer {
+height: calc(100vh - 150px);
+  background-color: #0a352d;
+}
+.section2 {
+height: calc(100vh - 75.98px);
+  background-image: url(/assets/images/hero-bg-4.png);
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+.sectionlg2 {
+    display: none;
+}
+.mobile {
+    display: none;
+}
+@media (max-width: 768px) {
+    .section2 {
+        display: none;
+    }
+    .desktop {
+        display: none;
+    }
+  .mobile {
+    display: block;
+    // height: calc(100vh - 76px);
+  }
+  .sectionlg2 {
+    display: block;
+    height: calc(100vh - 76px);
+    min-height: auto;
+    background-image: url("/assets/images/hero-bg-4.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+}
+
+.lawnlots-section {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  background:
+    // linear-gradient(rgba(255, 255, 255, 0.84), rgba(255, 255, 255, 0.84)),
+    url("/assets/images/background.jpg") center center / cover no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 30px;
+}
+
+.lawnlots-card {
+  width: 100%;
+  max-width: 1400px;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0;
+}
+
+.assembly-scene {
+  flex: 0 0 58%;
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  overflow: visible;
+}
+
+.assembled-wrapper {
+  position: relative;
+  width: 760px;
+  height: 760px;
+  margin-left: -120px;
+}
+
+.piece {
+  position: absolute;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+
+.piece-img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+}
+
+/* final positions */
+.piece-lower {
+  width: 620px;
+  left: 30px;
+  bottom: -20px;
+  z-index: 1;
+  animation: lowerAssemble 1.2s ease-out forwards;
+}
+
+.piece-middle {
+  width: 650px;
+  left: 8px;
+  bottom: 235px;
+  z-index: 2;
+  animation: middleAssemble 1.2s ease-out 0.45s forwards;
+}
+
+.piece-grass {
+  width: 720px;
+  left: -20px;
+  top: 65px;
+  z-index: 3;
+  animation: grassAssemble 1.2s ease-out 0.95s forwards;
+}
+
+.lawnlots-content {
+  flex: 0 0 42%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  z-index: 5;
+  margin-left: -30px;
+}
+
+.lawnlots-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 5vw, 4.6rem);
+  line-height: 0.95;
+  letter-spacing: 0.03em;
+  color: #2d2b2b;
+  margin: 0 0 10px;
+  animation: fadeUp 0.8s ease-out 1.5s both;
+}
+
+.lawnlots-subtitle {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.2rem, 2vw, 2rem);
+  line-height: 1.05;
+  color: #2d2b2b;
+  margin: 0 0 22px;
+  animation: fadeUp 0.8s ease-out 1.7s both;
+}
+
+.lawnlots-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeUp 0.8s ease-out 1.9s both;
+}
+
+.lot-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #083f37;
+  color: #fff;
+  text-decoration: none;
+  border-radius: 12px;
+  padding: 12px 22px;
+  min-width: 255px;
+  font-size: clamp(1rem, 1.2vw, 1.55rem);
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.14);
+  transition: transform 0.25s ease, background 0.25s ease;
+}
+
+.lot-btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  background: #0a5146;
+}
+
+/* animations */
+@keyframes lowerAssemble {
+  0% {
+    opacity: 0;
+    transform: translate(-140px, 240px) scale(0.92) rotate(-8deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(8px, -10px) scale(1.02) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0);
+  }
+}
+
+@keyframes middleAssemble {
+  0% {
+    opacity: 0;
+    transform: translate(-40px, -220px) scale(0.9) rotate(6deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(0, 10px) scale(1.01) rotate(-1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0);
+  }
+}
+
+@keyframes grassAssemble {
+  0% {
+    opacity: 0;
+    transform: translate(-260px, -140px) scale(0.95) rotate(-12deg);
+  }
+  70% {
+    opacity: 1;
+    transform: translate(14px, 6px) scale(1.01) rotate(1deg);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1) rotate(0);
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* tablet */
+@media (max-width: 1100px) {
+  .lawnlots-card {
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    padding: 40px 0;
+  }
+
+  .assembly-scene {
+    flex: unset;
+    width: 100%;
+    min-height: 520px;
+    justify-content: center;
+  }
+
+  .assembled-wrapper {
+    width: 560px;
+    height: 560px;
+    margin-left: 0;
+  }
+
+  .piece-lower {
+    width: 430px;
+    left: 40px;
+    bottom: 35px;
+  }
+
+  .piece-middle {
+    width: 455px;
+    left: 55px;
+    bottom: 165px;
+  }
+
+  .piece-grass {
+    width: 500px;
+    left: -15px;
+    top: 35px;
+  }
+
+  .lawnlots-content {
+    flex: unset;
+    max-width: 100%;
+    margin-left: 0;
+    align-items: center;
+    text-align: center;
+  }
+
+  .lawnlots-buttons {
+    align-items: center;
+  }
+}
+
+/* mobile */
+@media (max-width: 640px) {
+  .lawnlots-section {
+    padding: 20px 14px;
+  }
+
+  .assembly-scene {
+    min-height: 370px;
+  }
+
+  .assembled-wrapper {
+    width: 340px;
+    height: 360px;
+  }
+
+  .piece-lower {
+    width: 270px;
+    left: 18px;
+    bottom: 15px;
+  }
+
+  .piece-middle {
+    width: 285px;
+    left: 28px;
+    bottom: 95px;
+  }
+
+  .piece-grass {
+    width: 315px;
+    left: -18px;
+    top: 8px;
+  }
+
+  .lawnlots-title {
+    font-size: 2.6rem;
+  }
+
+  .lawnlots-subtitle {
+    font-size: 1.2rem;
+  }
+
+  .lot-btn {
+    min-width: 220px;
+    font-size: 0.95rem;
+    padding: 11px 16px;
+  }
+}
