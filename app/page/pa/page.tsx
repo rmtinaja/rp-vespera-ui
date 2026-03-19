@@ -4,8 +4,6 @@ import { useRef } from "react";
 // import CustomerReg from "./CustomerReg";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
-import CustomerReg from "../buyerReg/form/CustomerReg";
-
 export default function Form() {
   const toast = useRef<Toast>(null);
 
@@ -25,9 +23,6 @@ export default function Form() {
       <Toast ref={toast} />
 
       <Button onClick={show} label="Basic" />
-
-      {/* <CustomerReg /> */}
-
       asd
     </div>
   );

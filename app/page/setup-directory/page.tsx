@@ -1,11 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ModalComponent from "@/sharedComponents/ModalComponent";
+import { RoleDropdownService } from "@/domains/roles/services/RoleDropdown.service";
 
 export default function RoleTemplateComponent() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [roles, setRoles] = useState<RoleDropdown[]>([]);
+
+    type RoleDropdown = {
+        id: number;
+        name: string;
+    };
+
+
+    const lookup = async () => {
+        try {
+            const res = await RoleDropdownService.lookupRoleAvailability()
+            setRoles(res);
+        } catch (error) {
+            console.error("Error fetching roles:", error);
+        }
+    }
+
+    useEffect(() => {
+        lookup();
+    });
 
     return(
         <>
@@ -46,11 +67,12 @@ export default function RoleTemplateComponent() {
                         <label className="text-sm font-medium">
                             Role Template Name
                         </label>
-                        <input
-                            type="text"
-                            className="w-full border rounded p-2"
-                            placeholder="Enter role template name"
-                        />
+                        <select name="" id="">
+                            {roles.map((role) => (
+                                <option key={role.id}>{role.name}</option>
+                            ))}
+                            <option value="">--Select Role--</option>
+                        </select>
                     </div>
                     <div>
                         <label className="text-sm font-medium">
