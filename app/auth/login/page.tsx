@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import LoginUserComponent from "@/domains/auth/Components/LoginComponent";
+import LoginUserComponent from "@/domains/auth/Components/LoginUserComponent";
 
 export const metadata: Metadata = {
   title: "Login - Renaissance Park",

@@ -18,15 +18,17 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
 
   useEffect(() => {
     const data = {
-      firstName: sessionStorage.getItem("firstName") || "",
-      middleName: sessionStorage.getItem("middleName") || "",
-      lastName: sessionStorage.getItem("lastName") || "",
-      province: sessionStorage.getItem("province") || "",
-      provinceName: sessionStorage.getItem("provinceName") || "",
-      city: sessionStorage.getItem("city") || "",
-      cityName: sessionStorage.getItem("cityName") || "",
-      barangay: sessionStorage.getItem("barangay") || "",
-      barangayName: sessionStorage.getItem("barangayName") || "",
+      firstName: localStorage.getItem("firstName") || "",
+      middleName: localStorage.getItem("middleName") || "",
+      lastName: localStorage.getItem("lastName") || "",
+      province: localStorage.getItem("province") || "",
+      provinceName: localStorage.getItem("provinceName") || "",
+      city: localStorage.getItem("city") || "",
+      cityName: localStorage.getItem("cityName") || "",
+      barangay: localStorage.getItem("barangay") || "",
+      barangayName: localStorage.getItem("barangayName") || "",
+      image_base64: localStorage.getItem("image_base64") || "",
+      id_type: localStorage.getItem("id_type") || "",
     };
     setSessionData(data);
   }, []);
@@ -56,7 +58,7 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
     }
 
     setForm({ govId: file });
-    sessionStorage.setItem("govIdName", file.name);
+    localStorage.setItem("govIdName", file.name);
   };
 
   // Handle verification
@@ -76,6 +78,8 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
       };
 
       const result = await apiService.verifyId(dto);
+      localStorage.setItem("image_base64", result.image_base64);
+      localStorage.setItem("id_type", result.id_type);
       console.log("Verification success:", result);
       alert("ID verified successfully!");
       nextStep();

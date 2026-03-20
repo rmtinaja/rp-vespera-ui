@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { ApiService } from "@/domains/pa/Services/ApiService";
-import { CheckEmailDTO } from "@/domains/pa/DTO/CheckEmailDTO";
+import { ApiService } from "../../Services/ApiService";
+import { CheckEmailDTO } from "../../DTO/BuyerRegDTO";
 import { Button } from "primereact/button";
 import { Eye, EyeOff } from "lucide-react";
 
@@ -12,9 +12,9 @@ interface Step6Props {
 
 export default function Step6({ nextStep, backStep }: Step6Props) {
   const [form, setForm] = useState({
-    email: (sessionStorage.getItem("email") || ""),
-    passwordConfirmation: (sessionStorage.getItem("passwordConfirmation") || ""),
-    password: (sessionStorage.getItem("password") || ""),
+    email: (localStorage.getItem("email") || ""),
+    passwordConfirmation: (localStorage.getItem("passwordConfirmation") || ""),
+    password: (localStorage.getItem("password") || ""),
   });
 
   const [emailError, setEmailError] = useState("");
@@ -32,7 +32,7 @@ export default function Step6({ nextStep, backStep }: Step6Props) {
     setForm(updatedForm);
 
     // Save inputs to session immediately
-    sessionStorage.setItem(name, value);
+    localStorage.setItem(name, value);
   };
   // Debounced email uniqueness check
   useEffect(() => {
@@ -104,7 +104,7 @@ export default function Step6({ nextStep, backStep }: Step6Props) {
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 flex flex-col">
+      <div className="gap-4 flex flex-col">
         {/* Password */}
         <div className="flex flex-col">
           <label className="block text-sm font-medium text-dark">

@@ -37,7 +37,7 @@ export default function LSPayment({ nextPage }: Props) {
 
   // ---------------- FETCH LOTS ----------------
   useEffect(() => {
-    const stored = sessionStorage.getItem("verifiedCustomer");
+    const stored = localStorage.getItem("verifiedCustomer");
     if (!stored) return;
 
     const parsed = JSON.parse(stored);
@@ -209,7 +209,7 @@ export default function LSPayment({ nextPage }: Props) {
       const ownerId = Number(lots[0].mp_i_owner_id);
       const purchaserId = Number((lots[0] as any).mp_t_purchagr_id);
 
-      const stored = sessionStorage.getItem("verifiedCustomer");
+      const stored = localStorage.getItem("verifiedCustomer");
       const parsed = stored ? JSON.parse(stored) : null;
       const phoneNumber = parsed?.data?.phone;
 
