@@ -1,4 +1,5 @@
 'use client';
+
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,7 +9,7 @@ import { AuthService } from "@/domains/auth/Services/auth.service";
 export default function LoginUserComponent() {
   const router = useRouter();
 
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -16,10 +17,12 @@ export default function LoginUserComponent() {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await AuthService.login({ username, password });
+      const res = await AuthService.userlogin({ email, password });
+
       if (res.success) {
         document.cookie = `token=${res.token}; path=/`;
-        router.push("/page/select-module");
+        // router.push("/page/select-module");
+        alert("Login successful! Token stored in cookie.");
       } else {
         alert(res.message);
       }
@@ -31,124 +34,112 @@ export default function LoginUserComponent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center px-4">
-      {/* Two-column container */}
-      <div className="flex flex-col lg:flex-row w-full max-w-5xl">
-        
-        {/* Left: Login Form */}
-        <div className="flex-1 max-w-md bg-white rounded-2xl shadow-lg overflow-hidden">
-          {/* Card Header */}
-          <div className="border-b border-[#eaeae8] px-8 py-8 text-center">
+    <div className="h-screen overflow-hidden bg-[#f7f7f7] flex items-center justify-center">
+
+      <div className="w-full max-w-[1200px] h-[90vh] flex rounded-[4px] overflow-hidden">
+
+        <div className="w-full lg:w-[420px] bg-white border border-[#eaeae8] flex flex-col justify-center px-10">
+
+          <div className="mb-10">
             <img
               src="/assets/images/logo-hero.png"
-              alt="Company Logo"
-              className="w-32 h-auto mx-auto mb-8"
+              alt="Logo"
+              className="w-28 mb-8"
             />
-            <h1 className="font-playfair text-3xl font-medium text-gray-800">
+
+            <h1 className="font-playfair text-[32px] leading-[1.3] text-[#060503]">
               Welcome Back
             </h1>
-            <p className="mt-2 text-sm text-gray-500">
+
+            <p className="mt-2 text-[16px] text-[#6b6b6b]">
               Sign in to your account
             </p>
           </div>
 
-          {/* Form Body */}
-          <form
-            onSubmit={handleLogin}
-            className="px-8 py-8 flex flex-col gap-5"
-          >
-            {/* Username */}
+          <form onSubmit={handleLogin} className="flex flex-col gap-4">
+
             <div className="flex flex-col gap-2">
-              <label htmlFor="username" className="text-sm text-gray-600 font-inter">
-                Username
-              </label>
-              <div className="flex items-center border border-[#d0d0d0] rounded-md bg-[#f9f9f9] px-3 h-11 focus-within:border-[#b28648] focus-within:bg-white transition-colors">
-                <User2Icon className="w-5 h-5 text-gray-400" />
+              <label className="text-sm text-[#6b6b6b]">Email</label>
+              <div className="flex items-center border border-[#d6d3d1] rounded-[4px] px-3 h-11 focus-within:border-[#b28648]">
+                <User2Icon className="w-4 h-4 text-gray-400" />
                 <input
-                  type="text"
-                  id="username"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter your username"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your email"
                   required
-                  className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none ml-2 text-sm font-inter"
+                  className="flex-1 bg-transparent outline-none ml-2 text-sm"
                 />
               </div>
             </div>
 
-            {/* Password */}
             <div className="flex flex-col gap-2">
-              <label htmlFor="password" className="text-sm text-gray-600 font-inter">
-                Password
-              </label>
-              <div className="flex items-center border border-[#d0d0d0] rounded-md bg-[#f9f9f9] px-3 h-11 focus-within:border-[#b28648] focus-within:bg-white transition-colors">
-                <LockIcon className="w-5 h-5 text-gray-400" />
+              <label className="text-sm text-[#6b6b6b]">Password</label>
+              <div className="flex items-center border border-[#d6d3d1] rounded-[4px] px-3 h-11 focus-within:border-[#b28648]">
+                <LockIcon className="w-4 h-4 text-gray-400" />
                 <input
                   type="password"
-                  id="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   required
-                  className="flex-1 bg-transparent text-gray-800 placeholder-gray-400 outline-none ml-2 text-sm font-inter"
+                  className="flex-1 bg-transparent outline-none ml-2 text-sm"
                 />
               </div>
             </div>
 
-            {/* Forgot Password */}
-            <div className="flex justify-end -mt-2">
+            <div className="flex justify-end">
               <Link
                 href="/auth/forgot-password"
-                className="text-xs text-[#b28648] hover:text-[#9a7038] font-inter transition-colors"
+                className="text-xs text-[#b28648]"
               >
                 Forgot password?
               </Link>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={loading}
-              className="h-11 w-full rounded-md bg-[#b28648] hover:bg-[#9a7038] text-white font-medium text-sm font-inter transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-11 rounded-[4px] bg-[#b28648] text-white text-sm hover:bg-[#9a7038]"
             >
-              {loading ? "Signing in…" : "Sign In"}
+              {loading ? "Logging in..." : "Login"}
             </button>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3 my-2">
-              <div className="flex-1 h-px bg-[#eaeae8]" />
-              <span className="text-xs text-gray-400 uppercase tracking-widest font-inter">
-                or
-              </span>
-              <div className="flex-1 h-px bg-[#eaeae8]" />
-            </div>
+            <div className="h-px bg-[#d6d3d1] my-3" />
 
-            {/* Register Link */}
-            <div className="text-center text-sm text-gray-500 font-inter">
-              Don't have an account?{" "}
-              <Link
-                href="/auth/register"
-                className="text-[#b28648] hover:text-[#9a7038] font-medium transition-colors"
-              >
+            <p className="text-sm text-[#6b6b6b]">
+              Don’t have an account?{" "}
+              <Link href="/auth/register" className="text-[#b28648]">
                 Create one
               </Link>
-            </div>
+            </p>
+
           </form>
-
-          {/* Footer note */}
-          <p className="text-center text-xs text-gray-400 mt-6 font-inter">
-            Your information is kept private and secure.
-          </p>
         </div>
 
-        {/* Right: Image or Info Panel */}
-        <div className="flex-1 !lg:flex items-center justify-center bg-[#eaeae8] rounded-2xl overflow-hidden">
+        <div className="hidden lg:flex flex-1 relative">
+
+          {/* Image */}
           <img
-            src="/assets/images/ballonssss.png" 
-            alt="Welcome Image"
-            className="w-1/2 cover h-auto object-contain "
+            src="/assets/images/chapel.jpg"
+            alt="Chapel"
+            className="w-full h-full object-cover"
           />
+
+          <div className="absolute inset-0 bg-[#0c2a22]/50" />
+          <div className="absolute inset-0 flex flex-col justify-center px-16">
+
+            <h2 className="font-playfair text-[32px] leading-[1.3] text-white max-w-md">
+              Built for peace. Maintained for generations.
+            </h2>
+
+            <p className="mt-4 text-[16px] text-white/80 max-w-sm">
+              A place designed for stillness, order, and lasting care.
+            </p>
+
+          </div>
         </div>
+
       </div>
     </div>
   );

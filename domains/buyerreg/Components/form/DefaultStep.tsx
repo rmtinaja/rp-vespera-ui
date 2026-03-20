@@ -162,9 +162,8 @@ export default function Step1({ nextStep, setOtpTimer }: Step1Props) {
           minLength={11}
           pattern="\d{11}"
           title="Please enter exactly 11 digits"
-          className={`bg-white mt-1 w-full rounded-lg border px-3 py-2 focus:ring-green-500 focus:border-green-500 ${
-            mobileError ? "border-red-500" : "border-gray-300"
-          }`}
+          className={`bg-white mt-1 w-full rounded-lg border px-3 py-2 focus:ring-green-500 focus:border-green-500 ${mobileError ? "border-red-500" : "border-gray-300"
+            }`}
         />
         {checkingMobile && <small className="text-gray-500">Checking...</small>}
         {mobileError && <small className="text-red-500">{mobileError}</small>}
@@ -185,7 +184,7 @@ export default function Step1({ nextStep, setOtpTimer }: Step1Props) {
         {otpTimer > 0
           ? `Resend in ${Math.floor(otpTimer / 60)}:${String(otpTimer % 60).padStart(2, "0")}`
           : loading
-            ? "Checking..."
+            ? "Sending..."
             : "Send OTP"}
       </Button>
     </div>
