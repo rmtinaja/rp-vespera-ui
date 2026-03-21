@@ -1,15 +1,14 @@
-// sharedComponents/GlobalToast.js
-"use client";
 import { Toast } from "primereact/toast";
 import { useRef, useEffect } from "react";
-import { setToast } from "./services/AlertService";
+import { setToast } from "../services/AlertService";
 
-export default function GlobalToast() {
-  const toast = useRef(null);
+export default function GlobalToast(){
 
-  useEffect(() => {
-    setToast(toast.current);
-  }, []);
+    const toast = useRef(null);
 
-  return <Toast ref={toast} position="top-right" />;
+    useEffect(()=>{
+        setToast(toast.current);
+    },[]);
+
+    return <Toast ref={toast} position="top-right" />;
 }
