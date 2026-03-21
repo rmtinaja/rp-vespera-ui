@@ -9,12 +9,11 @@ interface Step6Props {
   backStep: () => void;
 }
 
-
 export default function Step6({ nextStep, backStep }: Step6Props) {
   const [form, setForm] = useState({
-    email: (localStorage.getItem("email") || ""),
-    passwordConfirmation: (localStorage.getItem("passwordConfirmation") || ""),
-    password: (localStorage.getItem("password") || ""),
+    email: localStorage.getItem("email") || "",
+    passwordConfirmation: localStorage.getItem("passwordConfirmation") || "",
+    password: localStorage.getItem("password") || "",
   });
 
   const [emailError, setEmailError] = useState("");
@@ -48,8 +47,11 @@ export default function Step6({ nextStep, backStep }: Step6Props) {
         const result = await api.checkEmail({
           email: form.email,
         } as CheckEmailDTO);
-        if (!result.isUnique) setEmailError(result.message);
-        else setEmailError("");
+        if (!result.isUnique) {
+          setEmailError(result.message || "Email is already registered.");
+        } else {
+          setEmailError("");
+        }
       } catch {
         setEmailError("Could not verify email at this time.");
       }
