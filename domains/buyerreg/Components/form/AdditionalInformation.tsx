@@ -6,11 +6,11 @@ interface Step3Props {
 }
 
 export default function Step3({ nextStep }: Step3Props) {
-  // Initialize form from sessionStorage
+  // Initialize form from localStorage
   const [form, setForm] = useState({
-    gender: sessionStorage.getItem("gender") || "",
-    birthDate: sessionStorage.getItem("birthDate") || "",
-    civilStatus: sessionStorage.getItem("civilStatus") || "",
+    gender: localStorage.getItem("gender") || "",
+    birthDate: localStorage.getItem("birthDate") || "",
+    civilStatus: localStorage.getItem("civilStatus") || "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -23,8 +23,8 @@ export default function Step3({ nextStep }: Step3Props) {
     const updatedForm = { ...form, [name]: value };
     setForm(updatedForm);
 
-    // Save to sessionStorage immediately
-    sessionStorage.setItem(name, value);
+    // Save to localStorage immediately
+    localStorage.setItem(name, value);
   };
 
   // Validate before moving to next step

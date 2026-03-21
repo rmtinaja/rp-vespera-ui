@@ -7,25 +7,42 @@ import Step3 from "./AdditionalInformation";
 import Step4 from "./AddressInformation";
 import Step5 from "./UploadGovernmentID";
 import Step6 from "./EmailPassword";
+import Step7 from "./ReviewDetails";
 
 export default function CustomerReg() {
-  const [step, setStep] = useState<number>(1);
+
+  const [otpTimer, setOtpTimer] = useState(0);
+
+  const [step, setStep] = useState<number | null>(null); // initially null
+  const [hydrated, setHydrated] = useState(false); // track client hydration
 
   useEffect(() => {
-    const savedStep = sessionStorage.getItem("step");
-    if (savedStep) {
-      setStep(Number(savedStep));
-    }
+    const savedStep = localStorage.getItem("step");
+    setStep(savedStep ? Number(savedStep) : 1);
+    setHydrated(true); // now it's safe to render
   }, []);
+  useEffect(() => {
+    if (step !== null) {
+      localStorage.setItem("step", String(step));
+    }
+  }, [step]);
+  
+  const nextStep = () => {
+    if (step !== null) setStep(step + 1);
+  };
 
-  const nextStep = () => setStep((prev) => prev + 1);
-  const backStep = () => setStep((prev) => prev - 1);
+  const backStep = () => {
+    if (step !== null) setStep(step - 1);
+  };
+
+  // Don't render anything until hydration to avoid mismatch
+  if (!hydrated || step === null) return null;
 
   return (
     <div className="w-full max-w-xl px-6 py-10 forms">
       <button
         onClick={() => (window.location.href = "/")}
-        className="absolute top-4 right-4  !text-dark px-4 py-3 rounded-full shadow hover:bg-green-700 transition flex items-center justify-center"
+        className="absolute top-4 right-4  bgAccent px-4 py-3 rounded-full shadow hover:bg-green-700 transition flex items-center justify-center"
       >
         <ChevronLeft className="w-7 h-7 text-white" />
       </button>
@@ -45,25 +62,13 @@ export default function CustomerReg() {
         </div>
 
         <div className="flex-1 overflow-y-auto px-8 py-6 space-y-4">
-
-          {step === 1 && <Step1 nextStep={nextStep} />}
-
-          {step === 2 && (
-            <Step2 nextStep={nextStep} backStep={backStep} />
-          )}
-          {step === 3 && (
-            <Step3 nextStep={nextStep} />
-          )}
-          {step === 4 && (
-            <Step4 nextStep={nextStep} backStep={backStep} />
-          )}
-          {step === 5 && (
-            <Step5 nextStep={nextStep} backStep={backStep} />
-          )}
-          {step === 6 && (
-            <Step6 nextStep={nextStep} backStep={backStep} />
-          )}
-
+          {step === 1 && <Step1 nextStep={nextStep} setOtpTimer={setOtpTimer} />}
+          {step === 2 && <Step2 nextStep={nextStep} backStep={backStep} otpTimer={otpTimer} setOtpTimer={setOtpTimer} />}
+          {step === 3 && <Step3 nextStep={nextStep} />}
+          {step === 4 && <Step4 nextStep={nextStep} backStep={backStep} />}
+          {step === 5 && <Step5 nextStep={nextStep}  backStep={backStep} />}
+          {step === 6 && <Step6 nextStep={nextStep} backStep={backStep} />}
+          {step === 7 && <Step7 backStep={backStep} />}
         </div>
       </div>
     </div>

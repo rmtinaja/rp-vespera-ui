@@ -20,7 +20,8 @@ export class ApiService {
   private checkMobileUrl: string;
 
   constructor() {
-    if (!API_URL) throw new Error("API URL is not defined in environment variables");
+    if (!API_URL)
+      throw new Error("API URL is not defined in environment variables");
 
     this.otpsend = `${API_URL}/sendOtp`;
     this.otpVerify = `${API_URL}/verifyOtp`;
@@ -56,7 +57,8 @@ export class ApiService {
 
   async verifyOtp(dto: OtpVerificationDTO): Promise<void> {
     if (!dto.otp) throw new Error("OTP is required");
-    if (!dto.phone || !dto.name1) throw new Error("Customer details are incomplete");
+    if (!dto.phone || !dto.name1)
+      throw new Error("Customer details are incomplete");
 
     const response = await fetch(this.otpVerify, {
       method: "POST",
@@ -65,7 +67,8 @@ export class ApiService {
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data.message || "OTP verification failed");
+    if (!response.ok)
+      throw new Error(data.message || "OTP verification failed");
   }
 
   // -------------------- ID Verification --------------------
@@ -107,7 +110,10 @@ export class ApiService {
   async registerUser(dto: SaveRegisterDTO): Promise<any> {
     const response = await fetch(this.registerUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json", // ✅ THIS FIXES 302
+      },
       body: JSON.stringify(dto),
     });
 
@@ -116,7 +122,6 @@ export class ApiService {
 
     return data;
   }
-
   // -------------------- Check Email --------------------
   async checkEmail(dto: CheckEmailDTO): Promise<any> {
     const res = await fetch(

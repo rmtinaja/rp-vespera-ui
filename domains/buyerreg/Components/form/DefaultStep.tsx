@@ -1,19 +1,25 @@
 import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
 import { ApiService } from "../../Services/ApiService";
-import { SendOtpDTO } from "../../DTO/BuyerRegDTO";
+import { SendOtpDTO, CheckMobileDTO } from "../../DTO/BuyerRegDTO";
 
-export default function Step1({ nextStep }: { nextStep: () => void }) {
+interface Step1Props {
+  nextStep: () => void;
+  setOtpTimer: (timer: number) => void; // Add this prop
+}
+export default function Step1({ nextStep, setOtpTimer }: Step1Props) {
   const [form, setForm] = useState({
     firstName: "",
     middleName: "",
     lastName: "",
     mobile: "",
   });
+  const [hydrated, setHydrated] = useState(false);
 
-  const [otpTimer, setOtpTimer] = useState(0);
   const [loading, setLoading] = useState(false);
   const [mobileError, setMobileError] = useState("");
+  const [checkingMobile, setCheckingMobile] = useState(false);
+  const [otpTimer, setLocalOtpTimer] = useState(0);
 
   const apiService = new ApiService();
 
@@ -21,18 +27,38 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
     const { name, value } = e.target;
     const updatedForm = { ...form, [name]: value };
     setForm(updatedForm);
+    localStorage.setItem(name, value);
 
-    // Save inputs to session immediately
-    sessionStorage.setItem(name, value);
+    // Only check mobile uniqueness on mobile input
+    if (name === "mobile") checkMobile(value);
+  };
+
+  const checkMobile = async (mobile: string) => {
+    setMobileError("");
+    if (mobile.length < 11) return; // skip if too short
+
+    setCheckingMobile(true);
+    try {
+      const dto: CheckMobileDTO = { mobile };
+      const result = await apiService.checkMobileUnique(dto);
+      if (!result.isUnique) {
+        setMobileError("This mobile number is already registered.");
+      } else {
+        setMobileError("");
+      }
+    } catch (err: any) {
+      setMobileError("Error checking mobile number.");
+    } finally {
+      setCheckingMobile(false);
+    }
   };
 
   const sendOTP = async () => {
+    if (mobileError) return; // prevent sending OTP if mobile invalid
     setLoading(true);
-    setMobileError("");
 
     try {
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
       const dto: SendOtpDTO = {
         phone: form.mobile,
         fname: form.firstName,
@@ -42,16 +68,10 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
         otp,
         message: `Your OTP is ${otp}. It will expire in 5 minutes.`,
       };
-
       await apiService.sendOtp(dto);
 
-      // Save OTP to session
-      // sessionStorage.setItem("otp", otp);
-
-      // Start 5-min timer
-      setOtpTimer(300);
-
-      // Move to next step
+      setOtpTimer(300); // Set timer in parent
+      setLocalOtpTimer(300); // Set local timer for display
       nextStep();
     } catch (err: any) {
       setMobileError(err.message);
@@ -61,15 +81,10 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
   };
 
   useEffect(() => {
-    if (otpTimer <= 0) return;
-    const interval = setInterval(() => setOtpTimer((prev) => prev - 1), 1000);
-    return () => clearInterval(interval);
-  }, [otpTimer]);
-  useEffect(() => {
-    const firstName = sessionStorage.getItem("firstName") || "";
-    const middleName = sessionStorage.getItem("middleName") || "";
-    const lastName = sessionStorage.getItem("lastName") || "";
-    const mobile = sessionStorage.getItem("mobile") || "";
+    const firstName = localStorage.getItem("firstName") || "";
+    const middleName = localStorage.getItem("middleName") || "";
+    const lastName = localStorage.getItem("lastName") || "";
+    const mobile = localStorage.getItem("mobile") || "";
 
     setForm({
       firstName: firstName.toUpperCase(),
@@ -77,12 +92,16 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
       lastName: lastName.toUpperCase(),
       mobile,
     });
+
+    setHydrated(true);
   }, []);
+
+  if (!hydrated) return null;
+
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-gray-700">Basic Information</h2>
 
-      {/* First Name */}
       <div className="flex flex-col">
         <label htmlFor="firstName" className="text-sm font-medium text-dark">
           First Name <span className="text-red-500">*</span>
@@ -98,7 +117,6 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
         />
       </div>
 
-      {/* Middle Name */}
       <div className="flex flex-col">
         <label htmlFor="middleName" className="text-sm font-medium text-dark">
           Middle Name <span className="text-gray-700">(Optional)</span>
@@ -114,7 +132,6 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
         />
       </div>
 
-      {/* Last Name */}
       <div className="flex flex-col">
         <label htmlFor="lastName" className="text-sm font-medium text-dark">
           Last Name <span className="text-red-500">*</span>
@@ -130,26 +147,28 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
         />
       </div>
 
-      {/* Mobile Number */}
       <div className="flex flex-col">
         <label htmlFor="mobile" className="text-sm font-medium text-dark">
           Mobile Number <span className="text-red-500">*</span>
         </label>
         <input
-          type="text"
+          type="tel"
           id="mobile"
           name="mobile"
           value={form.mobile}
           onChange={handleChange}
-          placeholder="Mobile"
-          minLength={11}
+          placeholder="Mobile (11 digits)"
           maxLength={11}
-          className={`bg-white mt-1 w-full rounded-lg border px-3 py-2 focus:ring-green-500 focus:border-green-500
-    ${mobileError ? "border-red-500" : "border-gray-300"}`}
+          minLength={11}
+          pattern="\d{11}"
+          title="Please enter exactly 11 digits"
+          className={`bg-white mt-1 w-full rounded-lg border px-3 py-2 focus:ring-green-500 focus:border-green-500 ${mobileError ? "border-red-500" : "border-gray-300"
+            }`}
         />
+        {checkingMobile && <small className="text-gray-500">Checking...</small>}
+        {mobileError && <small className="text-red-500">{mobileError}</small>}
       </div>
 
-      {/* Send OTP */}
       <Button
         type="button"
         onClick={sendOTP}
@@ -158,15 +177,14 @@ export default function Step1({ nextStep }: { nextStep: () => void }) {
           loading ||
           !form.mobile ||
           !form.firstName ||
-          !form.lastName
+          !form.lastName ||
+          !!mobileError
         }
       >
         {otpTimer > 0
-          ? `Resend in ${Math.floor(otpTimer / 60)}:${String(
-            otpTimer % 60,
-          ).padStart(2, "0")}`
+          ? `Resend in ${Math.floor(otpTimer / 60)}:${String(otpTimer % 60).padStart(2, "0")}`
           : loading
-            ? "Checking..."
+            ? "Sending..."
             : "Send OTP"}
       </Button>
     </div>

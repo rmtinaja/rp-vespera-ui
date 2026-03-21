@@ -9,12 +9,12 @@ interface Step4Props {
 
 export default function Step4({ nextStep, backStep }: Step4Props) {
   const [form, setForm] = useState({
-    province: sessionStorage.getItem("province") || "",
-    provinceName: sessionStorage.getItem("provinceName") || "",
-    city: sessionStorage.getItem("city") || "",
-    cityName: sessionStorage.getItem("cityName") || "",
-    barangay: sessionStorage.getItem("barangay") || "",
-    barangayName: sessionStorage.getItem("barangayName") || "",
+    province: localStorage.getItem("province") || "",
+    provinceName: localStorage.getItem("provinceName") || "",
+    city: localStorage.getItem("city") || "",
+    cityName: localStorage.getItem("cityName") || "",
+    barangay: localStorage.getItem("barangay") || "",
+    barangayName: localStorage.getItem("barangayName") || "",
   });
 
   const [provinces, setProvinces] = useState<LocationDTO[]>([]);
@@ -87,28 +87,28 @@ export default function Step4({ nextStep, backStep }: Step4Props) {
       updatedForm.cityName = "";
       updatedForm.barangay = "";
       updatedForm.barangayName = "";
-      sessionStorage.setItem("province", updatedForm.province);
-      sessionStorage.setItem("provinceName", updatedForm.provinceName);
-      sessionStorage.removeItem("city");
-      sessionStorage.removeItem("cityName");
-      sessionStorage.removeItem("barangay");
-      sessionStorage.removeItem("barangayName");
+      localStorage.setItem("province", updatedForm.province);
+      localStorage.setItem("provinceName", updatedForm.provinceName);
+      localStorage.removeItem("city");
+      localStorage.removeItem("cityName");
+      localStorage.removeItem("barangay");
+      localStorage.removeItem("barangayName");
     } else if (name === "city") {
       const selectedCity = cities.find((c) => c.code === value);
       updatedForm.city = value;
       updatedForm.cityName = selectedCity?.name || "";
       updatedForm.barangay = "";
       updatedForm.barangayName = "";
-      sessionStorage.setItem("city", updatedForm.city);
-      sessionStorage.setItem("cityName", updatedForm.cityName);
-      sessionStorage.removeItem("barangay");
-      sessionStorage.removeItem("barangayName");
+      localStorage.setItem("city", updatedForm.city);
+      localStorage.setItem("cityName", updatedForm.cityName);
+      localStorage.removeItem("barangay");
+      localStorage.removeItem("barangayName");
     } else if (name === "barangay") {
       const selectedBarangay = barangays.find((b) => b.code === value);
       updatedForm.barangay = value;
       updatedForm.barangayName = selectedBarangay?.name || "";
-      sessionStorage.setItem("barangay", updatedForm.barangay);
-      sessionStorage.setItem("barangayName", updatedForm.barangayName);
+      localStorage.setItem("barangay", updatedForm.barangay);
+      localStorage.setItem("barangayName", updatedForm.barangayName);
     }
 
     setForm(updatedForm);

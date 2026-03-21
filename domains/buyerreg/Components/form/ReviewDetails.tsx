@@ -1,124 +1,131 @@
+"use client";
+import { useEffect, useState } from "react";
 import { Button } from "primereact/button";
-interface Step5Props {
-  form: any;
-  backstep2: () => void;
-  onSubmit: () => void;
-  loading?: boolean;
-  setLoading: (loading: boolean) => void;
+import { SaveRegisterDTO } from "../../DTO/BuyerRegDTO";
+import { ApiService } from "../../Services/ApiService";
+import { useRouter } from "next/navigation";
+
+interface Step7Props {
+  backStep: () => void;
 }
 
-export default function Step7({
-  form,
-  backstep2,
-  onSubmit,
-  setLoading,
-  loading = false,
-}: Step5Props) {
+export default function Step7({ backStep }: Step7Props) {
+  const [sessionData, setSessionData] = useState<any>({});
+  const [loading, setLoading] = useState(false);
+  const apiService = new ApiService();
+  const router = useRouter();
+  useEffect(() => {
+    const savedData: any = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) savedData[key] = localStorage.getItem(key);
+    }
+    setSessionData(savedData);
+  }, []);
+
+  const onSubmit = async () => {
+    setLoading(true);
+    try {
+      const dto: SaveRegisterDTO = {
+        first_name: sessionData.firstName,
+        middle_name: sessionData.middleName,
+        last_name: sessionData.lastName,
+        mobile: sessionData.mobile,
+        image: sessionData.image_base64,
+        id_type: sessionData.id_type,
+        province: sessionData.provinceName,
+        city: sessionData.cityName,
+        barangay: sessionData.barangayName,
+        gender: sessionData.gender,
+        birth_date: sessionData.birthDate,
+        civil_status: sessionData.civilStatus,
+        type_of_payor: sessionData.typeOfPayor,
+        email: sessionData.email,
+        password: sessionData.password,
+        ip_address: sessionData.ipAddress,
+      };
+
+      await apiService.registerUser(dto);
+      alert("Registered Successfully!");
+      localStorage.clear();
+      setSessionData({});
+      router.push("/auth/login");
+    } catch (err: any) {
+      console.error(err);
+      alert(err.message || "Registration failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div id="step5" className="space-y-4">
-      <h2 className="text-lg font-semibold text-gray-700">Review Details</h2>
-      <p className="text-xs text-gray-500">
-        Please review your information before saving.
-      </p>
+    <div className="space-y-4 uppercase">
+      <h2 className="text-lg font-semibold">Review Your Details</h2>
 
       <div className="bg-gray-50 border rounded-lg p-4 space-y-2 text-sm">
-        {/* Full Name */}
         <div className="flex justify-between">
-          <span className="text-gray-500">Full Name</span>
-          <span className="font-medium text-gray-700">
-            {`${form.firstName} ${form.middleName || ""} ${form.lastName}`}
-          </span>
+          <span>Full Name :</span>
+          <span className="font-bold">{`${sessionData.firstName || ""} ${sessionData.middleName || ""} ${sessionData.lastName || ""}`}</span>
         </div>
 
-        {/* Birth Date */}
         <div className="flex justify-between">
-          <span className="text-gray-500">Birth Date</span>
-          <span className="font-medium text-gray-700">{form.birthDate}</span>
+          <span>Email : </span>
+          <span className="font-bold">{sessionData.email || ""}</span>
         </div>
 
-        {/* Gender */}
         <div className="flex justify-between">
-          <span className="text-gray-500">Gender</span>
-          <span className="font-medium text-gray-700">{form.gender}</span>
+          <span>Phone : </span>
+          <span className="font-bold">{sessionData.mobile || ""}</span>
         </div>
 
-        {/* Civil Status */}
         <div className="flex justify-between">
-          <span className="text-gray-500">Civil Status</span>
-          <span className="font-medium text-gray-700">{form.civilStatus}</span>
+          <span>Gender :</span>
+          <span className="font-bold">{sessionData.gender || ""}</span>
         </div>
 
-        {/* Email */}
         <div className="flex justify-between">
-          <span className="text-gray-500">Email</span>
-          <span className="font-medium text-gray-700">{form.email}</span>
+          <span>Civil Status :</span>
+          <span className="font-bold">{sessionData.civilStatus || ""}</span>
         </div>
 
-        {/* Phone */}
         <div className="flex justify-between">
-          <span className="text-gray-500">Phone</span>
-          <span className="font-medium text-gray-700">{form.mobile}</span>
+          <span>Address :</span>
+          <span className="font-bold">{`${sessionData.barangayName || ""}, ${sessionData.cityName || ""}, ${sessionData.provinceName || ""}`}</span>
         </div>
 
-        {/* Address */}
         <div className="flex justify-between">
-          <span className="text-gray-500">Address</span>
-          <span className="font-medium text-gray-700 text-right">
-            {`${form.barangay_name}, ${form.city_name}, ${form.province_name}`}
-          </span>
+          <span>ID Type :</span>
+          <span className="font-bold">{sessionData.id_type || ""}</span>
         </div>
 
-        {/* ID Type */}
-        <div className="flex justify-between">
-          <span className="text-gray-500">ID Type Detected</span>
-          <span className="font-medium text-gray-700">{form.id_type}</span>
-        </div>
-
-        {/* Valid ID */}
-        <div className="flex justify-between">
-          <span className="text-gray-500">Valid ID</span>
-          <span className="font-medium text-gray-700">
-            {form.valid_id ? "Yes" : "No"}
-          </span>
-        </div>
-
-        {/* Preview Base64 image */}
         <div className="mt-2">
-          {form.base64 ? (
+          {sessionData.image_base64 ? (
             <img
-              src={`data:image/jpeg;base64,${form.base64}`}
+              src={`data:image/jpeg;base64,${sessionData.image_base64}`}
               alt="Uploaded Government ID"
               className="w-48 h-auto rounded-lg border border-gray-300"
             />
           ) : (
-            <span className="text-gray-400">No ID uploaded yet</span>
+            <span className="text-gray-400">No ID uploaded</span>
           )}
         </div>
       </div>
 
-      {/* Buttons */}
       <div className="flex gap-2 pt-4">
         <button
           type="button"
-          onClick={backstep2}
+          onClick={backStep}
           className="w-1/2 py-2 bg-gray-400 text-white rounded-lg"
         >
           Back
         </button>
 
         <Button
+          type="button"
           icon="pi pi-check"
           loading={loading}
-          type="button"
-          onClick={async () => {
-            setLoading(true);
-            try {
-              await onSubmit();
-            } finally {
-              setLoading(false);
-            }
-          }}
-          className="w-1/2 justify-center py-2 bg-green-600 text-white rounded-lg"
+          onClick={onSubmit}
+          className="w-1/2 py-2 bg-green-600 text-white rounded-lg"
         >
           Submit
         </Button>
