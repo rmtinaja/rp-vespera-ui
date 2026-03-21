@@ -72,9 +72,9 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
         fname: sessionData.firstName,
         mname: sessionData.middleName || null,
         lname: sessionData.lastName,
-        province: sessionData.province,
-        city: sessionData.city,
-        barangay: sessionData.barangay,
+        province: sessionData.provinceName,
+        city: sessionData.cityName,
+        barangay: sessionData.barangayName,
       };
 
       const result = await apiService.verifyId(dto);
