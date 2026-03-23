@@ -34,7 +34,15 @@ export const AuthService = {
     login: async (payload: { username: string; password: string }) => {
         const res = await axios.post(`${BASE_URL}/v1/login`, payload)
         const token = res.data.token
-        if(token){
+        if (token) {
+            localStorage.setItem("token", token)
+        }
+        return res.data
+    },
+    userlogin: async (payload: { email: string; password: string }) => {
+        const res = await axios.post(`${BASE_URL}/v1/userlogin`, payload)
+        const token = res.data.token
+        if (token) {
             localStorage.setItem("token", token)
         }
         return res.data

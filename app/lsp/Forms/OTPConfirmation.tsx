@@ -27,7 +27,7 @@ export default function OTPConfirmation({ nextPage }: Props) {
   const isValidOTP = otp.length === 6;
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("verifiedCustomer");
+    const stored = localStorage.getItem("verifiedCustomer");
     if (stored) {
       const parsed: VerifiedCustomerResponse = JSON.parse(stored);
       setCustomer(parsed.data);
