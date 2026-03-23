@@ -61,8 +61,6 @@ export default function LSPayment({ nextPage }: Props) {
     };
     fetchLots();
   }, []);
-
-  // ---------------- AI RECEIPT ----------------
   const handleReadReceipt = async (file: File) => {
     try {
       setAiReading(true);
