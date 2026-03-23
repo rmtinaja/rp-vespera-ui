@@ -40,6 +40,7 @@ export interface SaveRegisterDTO {
   email?: string;
   password?: string;
   ip_address?: string;
+  id_name?: string;
 }
 
 export interface OtpVerificationDTO {

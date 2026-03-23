@@ -4,16 +4,21 @@ import { Button } from "primereact/button";
 import { SaveRegisterDTO } from "../../DTO/BuyerRegDTO";
 import { ApiService } from "../../Services/ApiService";
 import { useRouter } from "next/navigation";
+import { AuthService } from "@/domains/auth/Services/auth.service";
 
 interface Step7Props {
   backStep: () => void;
 }
 
 export default function Step7({ backStep }: Step7Props) {
+  const [ip, setIp] = useState("");
   const [sessionData, setSessionData] = useState<any>({});
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);     
+  const [loggingIn, setLoggingIn] = useState(false); 
+
   const apiService = new ApiService();
   const router = useRouter();
+
   useEffect(() => {
     const savedData: any = {};
     for (let i = 0; i < localStorage.length; i++) {
@@ -21,10 +26,25 @@ export default function Step7({ backStep }: Step7Props) {
       if (key) savedData[key] = localStorage.getItem(key);
     }
     setSessionData(savedData);
+
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => {
+        setIp(data.ip);
+      })
+      .catch(() => {
+        setIp("0.0.0.0");
+      });
   }, []);
 
   const onSubmit = async () => {
+    if (!ip) {
+      alert("Fetching IP, please wait...");
+      return;
+    }
+
     setLoading(true);
+
     try {
       const dto: SaveRegisterDTO = {
         first_name: sessionData.firstName,
@@ -42,19 +62,38 @@ export default function Step7({ backStep }: Step7Props) {
         type_of_payor: sessionData.typeOfPayor,
         email: sessionData.email,
         password: sessionData.password,
-        ip_address: sessionData.ipAddress,
+        ip_address: ip, 
+        id_name: sessionData.type_of_id, 
       };
 
       await apiService.registerUser(dto);
-      alert("Registered Successfully!");
-      localStorage.clear();
-      setSessionData({});
-      router.push("/auth/login");
+
+      setLoading(false);
+      setLoggingIn(true);
+
+      const loginRes = await AuthService.userlogin({
+        email: sessionData.email,
+        password: sessionData.password,
+        ip: sessionData.ip_address
+      });
+
+      if (loginRes.success) {
+        document.cookie = `token=${loginRes.token}; path=/`;
+
+        localStorage.clear();
+        setSessionData({});
+
+        router.push("/");
+        router.refresh();
+      } else {
+        router.push("/auth/login");
+      }
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Registration failed");
     } finally {
       setLoading(false);
+      setLoggingIn(false);
     }
   };
 
@@ -65,16 +104,18 @@ export default function Step7({ backStep }: Step7Props) {
       <div className="bg-gray-50 border rounded-lg p-4 space-y-2 text-sm">
         <div className="flex justify-between">
           <span>Full Name :</span>
-          <span className="font-bold">{`${sessionData.firstName || ""} ${sessionData.middleName || ""} ${sessionData.lastName || ""}`}</span>
+          <span className="font-bold">
+            {`${sessionData.firstName || ""} ${sessionData.middleName || ""} ${sessionData.lastName || ""}`}
+          </span>
         </div>
 
         <div className="flex justify-between">
-          <span>Email : </span>
+          <span>Email :</span>
           <span className="font-bold">{sessionData.email || ""}</span>
         </div>
 
         <div className="flex justify-between">
-          <span>Phone : </span>
+          <span>Phone :</span>
           <span className="font-bold">{sessionData.mobile || ""}</span>
         </div>
 
@@ -90,7 +131,9 @@ export default function Step7({ backStep }: Step7Props) {
 
         <div className="flex justify-between">
           <span>Address :</span>
-          <span className="font-bold">{`${sessionData.barangayName || ""}, ${sessionData.cityName || ""}, ${sessionData.provinceName || ""}`}</span>
+          <span className="font-bold">
+            {`${sessionData.barangayName || ""}, ${sessionData.cityName || ""}, ${sessionData.provinceName || ""}`}
+          </span>
         </div>
 
         <div className="flex justify-between">
@@ -115,6 +158,7 @@ export default function Step7({ backStep }: Step7Props) {
         <button
           type="button"
           onClick={backStep}
+          disabled={loading || loggingIn}
           className="w-1/2 py-2 bg-gray-400 text-white rounded-lg"
         >
           Back
@@ -123,11 +167,15 @@ export default function Step7({ backStep }: Step7Props) {
         <Button
           type="button"
           icon="pi pi-check"
-          loading={loading}
+          loading={loading || loggingIn}
           onClick={onSubmit}
           className="w-1/2 py-2 bg-green-600 text-white rounded-lg"
         >
-          Submit
+          {loading
+            ? "Submitting..."
+            : loggingIn
+            ? "Logging in..."
+            : "Submit"}
         </Button>
       </div>
     </div>

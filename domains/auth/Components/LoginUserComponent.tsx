@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LockIcon, User2Icon } from "lucide-react";
 import { AuthService } from "@/domains/auth/Services/auth.service";
@@ -9,6 +9,23 @@ import { AuthService } from "@/domains/auth/Services/auth.service";
 export default function LoginUserComponent() {
   const router = useRouter();
 
+  const [ip, setIp] = useState("");
+   useEffect(() => {
+      const savedData: any = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key) savedData[key] = localStorage.getItem(key);
+      }
+  
+      fetch("https://api.ipify.org?format=json")
+        .then((res) => res.json())
+        .then((data) => {
+          setIp(data.ip);
+        })
+        .catch(() => {
+          setIp("0.0.0.0");
+        });
+    }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -17,12 +34,15 @@ export default function LoginUserComponent() {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await AuthService.userlogin({ email, password });
+      const res = await AuthService.userlogin({ email, password, ip });
 
       if (res.success) {
         document.cookie = `token=${res.token}; path=/`;
-        // router.push("/page/select-module");
-        alert("Login successful! Token stored in cookie.");
+
+        router.push("/");
+        router.refresh(); // 🔥 ensures header detects login
+
+        // alert("Login successful!");
       } else {
         alert(res.message);
       }
@@ -35,11 +55,8 @@ export default function LoginUserComponent() {
 
   return (
     <div className="h-screen overflow-hidden bg-[#f7f7f7] flex items-center justify-center">
-
       <div className="w-full max-w-[1200px] h-[90vh] flex rounded-[4px] overflow-hidden">
-
         <div className="w-full lg:w-[420px] bg-white border border-[#eaeae8] flex flex-col justify-center px-10">
-
           <div className="mb-10">
             <img
               src="/assets/images/logo-hero.png"
@@ -57,7 +74,6 @@ export default function LoginUserComponent() {
           </div>
 
           <form onSubmit={handleLogin} className="flex flex-col gap-4">
-
             <div className="flex flex-col gap-2">
               <label className="text-sm text-[#6b6b6b]">Email</label>
               <div className="flex items-center border border-[#d6d3d1] rounded-[4px] px-3 h-11 focus-within:border-[#b28648]">
@@ -113,12 +129,10 @@ export default function LoginUserComponent() {
                 Create one
               </Link>
             </p>
-
           </form>
         </div>
 
         <div className="hidden lg:flex flex-1 relative">
-
           {/* Image */}
           <img
             src="/assets/images/chapel.jpg"
@@ -128,7 +142,6 @@ export default function LoginUserComponent() {
 
           <div className="absolute inset-0 bg-[#0c2a22]/50" />
           <div className="absolute inset-0 flex flex-col justify-center px-16">
-
             <h2 className="font-playfair text-[32px] leading-[1.3] text-white max-w-md">
               Built for peace. Maintained for generations.
             </h2>
@@ -136,10 +149,8 @@ export default function LoginUserComponent() {
             <p className="mt-4 text-[16px] text-white/80 max-w-sm">
               A place designed for stillness, order, and lasting care.
             </p>
-
           </div>
         </div>
-
       </div>
     </div>
   );
