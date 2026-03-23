@@ -16,22 +16,22 @@ export default function Form() {
   const [paymentForm, setPaymentForm] = useState<string>("");
   
   useEffect(() => {
-    const stored = localStorage.getItem("CurrentForm");
+    const stored = sessionStorage.getItem("CurrentForm");
     if(stored){
       setCurrentForm(Number(stored));
     }else{
-      localStorage.setItem("CurrentForm", "0");
+      sessionStorage.setItem("CurrentForm", "0");
     }
   }, []);
 
   const changeForm = (step: number, payment?: string) => {
     if (payment) {
       setPaymentForm(payment);
-      localStorage.setItem("PaymentOption", payment);
+      sessionStorage.setItem("PaymentOption", payment);
     }
 
     setCurrentForm(step);
-    localStorage.setItem("CurrentForm", step.toString());
+    sessionStorage.setItem("CurrentForm", step.toString());
   };
   return (
     <div className="w-full flex flex-row justify-center">

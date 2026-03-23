@@ -23,7 +23,7 @@ export default function CustomerInformation({ nextPage }: Props) {
         middlename: middlename || null,
         lastname,
       });
-      localStorage.setItem(
+      sessionStorage.setItem(
         "verifiedCustomer",
         JSON.stringify(result)
       );
