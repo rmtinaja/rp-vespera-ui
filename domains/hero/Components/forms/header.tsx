@@ -120,7 +120,7 @@ export default function Header() {
             </li>
 
             <li>
-              <a href="" className="hover:text-[#34554f] transition">
+              <a href="#footer" className="hover:text-[#34554f] transition">
                 Visit Us
               </a>
             </li>

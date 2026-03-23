@@ -3,7 +3,7 @@ import { Phone, Facebook, MapPin, Trees } from "lucide-react";
 
 export default function Footer() {
     return (
-        <section className="footer w-full py-16 bg-gray-900 text-white">
+        <section id="footer" className="footer w-full py-16 bg-gray-900 text-white">
 
             {/* Logo */}
             <div className="flex flex-col items-center gap-4">
