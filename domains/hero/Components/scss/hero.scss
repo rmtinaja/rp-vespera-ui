@@ -38,6 +38,84 @@ height: calc(100vh - 75.98px);
 .mobile {
     display: none;
 }
+/* RESET (important to remove scroll) */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+/* SECTION */
+.lawnlots-section {
+  height: 100vh;       /* full screen */
+  width: 100%;
+  overflow: hidden;    /* no scroll */
+  display: flex;
+}
+
+/* CARD CONTAINER */
+.lawnlots-card {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+/* LEFT SIDE */
+.lawnlots-left {
+  width: 50%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* RIGHT SIDE */
+.lawnlots-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+/* TITLE */
+.lawnlots-title {
+  font-size: 64px;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* SUBTITLE */
+.lawnlots-subtitle {
+  font-size: 20px;
+  margin: 20px 0 40px;
+  line-height: 1.5;
+}
+
+/* BUTTON GROUP */
+.lawnlots-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* BUTTON STYLE */
+.lot-btn {
+  text-decoration: none;
+  padding: 12px 20px;
+  border: 1px solid #000;
+  display: inline-block;
+  width: fit-content;
+  transition: 0.3s ease;
+}
+html {
+  scroll-behavior: smooth;
+}
+.lot-btn:hover {
+  background: black;
+  color: white;
+}
 @media (max-width: 768px) {
     .section2 {
         display: none;

@@ -78,7 +78,8 @@ export default function Step6({ nextStep, backStep }: Step6Props) {
     !!emailError ||
     !!passwordError ||
     form.password === "" ||
-    form.passwordConfirmation === "";
+    form.passwordConfirmation === "" ||
+    form.email === "";
 
   return (
     <div id="step2" className="space-y-4">
@@ -87,11 +88,12 @@ export default function Step6({ nextStep, backStep }: Step6Props) {
       {/* Email */}
       <div className="flex flex-col">
         <label className="block text-sm font-medium text-dark">
-          Email Address <span className="text-gray-700">(Optional)</span>
+          Email Address <span className="text-red-700">*</span>
         </label>
         <input
           type="email"
           name="email"
+          required
           onChange={handleChange}
           value={form.email}
           placeholder="example@email.com"
