@@ -18,10 +18,10 @@ export interface SendOtpDTO {
   message: string;
 }
 export interface SavePasswordDTO {
-  user_id: string; 
+  user_id: string;
   password: string;
-  confirm_password?: string; 
-  ip_address?: string; 
+  confirm_password?: string;
+  ip_address?: string;
 }
 export interface SaveRegisterDTO {
   first_name: string;
@@ -48,6 +48,16 @@ export interface OtpVerificationDTO {
   phone: string;
   module: string;
   otp: string;
+}
+export interface OneTimeOtpVerificationDTO {
+  name1?: string;
+  phone: string;
+  module: string;
+  otp: string;
+  ip_match: string;
+  otpId?: number;
+  userId?: number;
+  ipaddress?: string;
 }
 
 export interface CheckMobileDTO {

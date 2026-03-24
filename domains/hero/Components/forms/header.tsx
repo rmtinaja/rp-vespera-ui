@@ -52,7 +52,7 @@ export default function Header() {
                 <ul className="py-2 text-sm">
                   <li>
                     <Link
-                      href="/lawn-lots"
+                      href="/hero/products/lawnlots"
                       className="block px-4 py-2 hover:bg-gray-100"
                     >
                       Lawn Lots
@@ -124,11 +124,13 @@ export default function Header() {
                 Visit Us
               </a>
             </li>
-            <li>
-              <a href="#" className="hover:text-[#34554f] transition">
-                Check SOA
-              </a>
-            </li>
+            {isLoggedIn ?? (
+              <li>
+                <a href="#" className="hover:text-[#34554f] transition">
+                  Check SOA
+                </a>
+              </li>
+            )}
 
             <li className="ml-4">
               {isLoggedIn ? (
@@ -137,8 +139,8 @@ export default function Header() {
                     onClick={() => {
                       const confirmLogout = confirm("Do you want to log out?");
                       if (!confirmLogout) return;
-
                       document.cookie = "token=; Max-Age=0; path=/";
+                      localStorage.clear();
                       setIsLoggedIn(false);
                     }}
                     className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
@@ -156,15 +158,9 @@ export default function Header() {
                   <Link href="/auth/register">
                     <button
                       onClick={() => {
-                        // 🔥 clear all stored data
                         localStorage.clear();
                         sessionStorage.clear();
-
-                        // (optional) clear auth token too
                         document.cookie = "token=; Max-Age=0; path=/";
-
-                        // // redirect
-                        // window.location.href = "/auth/register";
                       }}
                       className="px-4 py-2 bg-[#34554f] text-white rounded"
                     >
