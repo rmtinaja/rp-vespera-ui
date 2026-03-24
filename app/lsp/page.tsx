@@ -40,7 +40,7 @@ export default function Form() {
           <CustomerInformation nextPage={() => changeForm(1)} />
         )}
         {currentForm === 1 && (
-          <OTPConfirmation nextPage={() => changeForm(2)} />
+          <OTPConfirmation nextPage={() => changeForm(2)} prevPage={() => changeForm(0)}/>
         )}
         {currentForm === 2 && (
           <PaymentSelection

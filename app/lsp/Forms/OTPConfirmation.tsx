@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { PaymentService } from "@/domains/lsp/Services/PaymentService";
+import router from "next/router";
 
 interface Props {
   nextPage: () => void;
+  prevPage: () => void;
 }
 
 interface VerifiedCustomerResponse {
@@ -17,7 +19,7 @@ interface VerifiedCustomerResponse {
   };
 }
 
-export default function OTPConfirmation({ nextPage }: Props) {
+export default function OTPConfirmation({ nextPage , prevPage }: Props) {
   const [displayOTPField, setDisplayOTPField] = useState(false);
   const [otp, setOtp] = useState("");
   const [customer, setCustomer] =
@@ -33,6 +35,9 @@ export default function OTPConfirmation({ nextPage }: Props) {
       setCustomer(parsed.data);
     }
   }, []);
+  const CancelOTP = () => {
+    prevPage();
+  };
   const handleSendOtp = async () => {
     if (!customer) return;
 
@@ -114,7 +119,7 @@ export default function OTPConfirmation({ nextPage }: Props) {
                 {loading ? "Sending..." : "Yes, it's me"}
               </button>
 
-              <button className="btn-danger">
+              <button className="btn-danger" onClick={CancelOTP}>
                 No
               </button>
             </div>
