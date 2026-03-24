@@ -6,28 +6,24 @@ import { OtpVerificationDTO, SendOtpDTO } from "../../DTO/BuyerRegDTO";
 interface Step2Props {
   nextStep: () => void;
   backStep: () => void;
-  otpTimer: number; // Receive timer from parent
-  setOtpTimer: (timer: number) => void; // Update timer from parent
+  otpTimer: number; 
+  setOtpTimer: (timer: number) => void; 
 }
 
 export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Step2Props) {
   const apiService = new ApiService();
 
-  // -------------------- State --------------------
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [resending, setResending] = useState(false);
-
-  // Get stored values from Step1
   const mobile = localStorage.getItem("mobile") || "";
   const firstName = localStorage.getItem("firstName") || "";
   const middleName = localStorage.getItem("middleName") || "";
   const lastName = localStorage.getItem("lastName") || "";
 
-  // -------------------- Handle Change --------------------
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Only allow numbers
+
     const value = e.target.value.replace(/\D/g, "");
     if (value.length <= 6) {
       setOtp(value);
@@ -35,7 +31,6 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
     }
   };
 
-  // -------------------- Verify OTP --------------------
   const verifyOTP = async () => {
     if (!otp || otp.length !== 6) {
       setError("Please enter a valid 6-digit OTP");
@@ -54,17 +49,16 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
       };
 
       await apiService.verifyOtp(dto);
-      nextStep(); // Proceed to next step
+      nextStep();
     } catch (err: any) {
       console.error("OTP verification failed:", err);
       setError(err.message || "Invalid OTP. Please try again.");
-      setOtp(""); // Clear OTP input on error
+      setOtp("");
     } finally {
       setLoading(false);
     }
   };
 
-  // -------------------- Resend OTP --------------------
   const resendOTP = async () => {
     if (otpTimer > 0) return;
     
@@ -86,11 +80,10 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
 
       await apiService.sendOtp(dto);
       
-      // Store OTP temporarily for verification (optional)
       sessionStorage.setItem("otp", newOtp);
       
-      setOtpTimer(300); // Reset timer in parent
-      setOtp(""); // Clear OTP input
+      setOtpTimer(300);
+      setOtp(""); 
     } catch (err: any) {
       setError(err.message || "Failed to send OTP. Please try again.");
     } finally {
@@ -98,14 +91,12 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
     }
   };
 
-  // -------------------- Format Timer --------------------
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
-  // -------------------- Timer Effect --------------------
   useEffect(() => {
     if (otpTimer <= 0) return;
     
@@ -116,15 +107,12 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
     return () => clearInterval(interval);
   }, [otpTimer, setOtpTimer]);
 
-  // -------------------- Initial Load - Check Timer --------------------
   useEffect(() => {
-    // If timer is 0 on load, show message
     if (otpTimer === 0) {
       setError("OTP has expired. Please request a new one.");
     }
   }, [otpTimer]);
 
-  // -------------------- UI --------------------
   return (
     <div className="space-y-4  max-w-md mx-auto">
       <div className="flex items-center">
@@ -143,7 +131,6 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
         <strong className="text-blue-600">{(mobile)}</strong>
       </p>
 
-      {/* OTP Input */}
       <div className="flex justify-center">
         <input
           type="text"
@@ -159,14 +146,12 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
         />
       </div>
 
-      {/* Error Message */}
       {error && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-3">
           <span className="text-red-600 text-sm">{error}</span>
         </div>
       )}
 
-      {/* Buttons */}
       <div className="flex flex-row gap-3 mt-2">
         <Button
           type="button"

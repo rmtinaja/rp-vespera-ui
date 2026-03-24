@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import MarbleBlock from "../dialog/marble-blocks";
+import MarbleBlock from "../../dialog/marble-blocks";
 
 export default function LawnLots() {
     return (
@@ -28,13 +28,13 @@ export default function LawnLots() {
                     </p>
 
                     <div className="flex flex-col gap-4 lawnlots-buttons ">
-                        <Link href="products/lawnlots/regular-lawn" className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white">
+                        <Link href="lawnlots/regular-lawn" className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white">
                             REGULAR LAWN
                         </Link>
-                        <Link href="products/lawnlots/premium-lawn" className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white">
+                        <Link href="lawnlots/premium-lawn" className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white">
                             PREMIUM LAWN
                         </Link>
-                        <Link href="products/lawnlots/super-premium-lawn" className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white">
+                        <Link href="lawnlots/super-premium-lawn" className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white">
                             SUPER PREMIUM LAWN
                         </Link>
                     </div>

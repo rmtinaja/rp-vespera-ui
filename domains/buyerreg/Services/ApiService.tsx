@@ -2,6 +2,7 @@ import {
   SendOtpDTO,
   OtpVerificationDTO,
   VerifyIdDTO,
+  OneTimeOtpVerificationDTO,
   SavePasswordDTO,
   SaveRegisterDTO,
   CheckEmailDTO,
@@ -13,6 +14,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL;
 export class ApiService {
   private otpsend: string;
   private otpVerify: string;
+  private oneTimeOtpVerify: string;
   private verifyUrl: string;
   private savePasswordUrl: string;
   private registerUrl: string;
@@ -26,6 +28,7 @@ export class ApiService {
     this.otpsend = `${API_URL}/sendOtp`;
     this.otpVerify = `${API_URL}/verifyOtp`;
     this.verifyUrl = `${API_URL}/verifyID`;
+    this.oneTimeOtpVerify = `${API_URL}/verifyOneTimeOtp`;
     this.savePasswordUrl = `${API_URL}/save-password`;
     this.registerUrl = `${API_URL}/register`;
     this.checkEmailUrl = `${API_URL}/check-email`;
@@ -61,6 +64,21 @@ export class ApiService {
       throw new Error("Customer details are incomplete");
 
     const response = await fetch(this.otpVerify, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto),
+    });
+
+    const data = await response.json();
+    if (!response.ok)
+      throw new Error(data.message || "OTP verification failed");
+  }
+  async verifyOneTimeOtp(dto: OneTimeOtpVerificationDTO): Promise<void> {
+    if (!dto.otp) throw new Error("OTP is required");
+    if (!dto.phone || !dto.name1)
+      throw new Error("Customer details are incomplete");
+
+    const response = await fetch(this.oneTimeOtpVerify, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dto),

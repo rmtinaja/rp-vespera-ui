@@ -1,82 +1,94 @@
-import axios from "axios"
+import axios from "axios";
 import {
-    EmployeeRegistrationLookupRequest,
-    VerifyOTPRequest,
-    PasswordConfirmationRequest
-} from "../DTO/auth.dto"
-
+  EmployeeRegistrationLookupRequest,
+  VerifyOTPRequest,
+  PasswordConfirmationRequest,
+} from "../DTO/auth.dto";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 export const AuthService = {
+  lookupEmployee: async (payload: EmployeeRegistrationLookupRequest) => {
+    const res = await axios.post(`${BASE_URL}/employee/lookup`, payload);
+    return res.data;
+  },
 
-    lookupEmployee: async (payload: EmployeeRegistrationLookupRequest) => {
-        const res = await axios.post(`${BASE_URL}/employee/lookup`, payload)
-        return res.data
-    },
+  sendOTP: async (employeeId: number) => {
+    const res = await axios.post(`${BASE_URL}/employee/send-otp`, {
+      employee_id: employeeId,
+    });
+    return res.data;
+  },
 
-    sendOTP: async (employeeId: number) => {
-        const res = await axios.post(`${BASE_URL}/employee/send-otp`, {
-            employee_id: employeeId
-        })
-        return res.data
-    },
+  verifyOTP: async (payload: VerifyOTPRequest) => {
+    const res = await axios.post(`${BASE_URL}/employee/verify-otp`, payload);
+    return res.data;
+  },
 
-    verifyOTP: async (payload: VerifyOTPRequest) => {
-        const res = await axios.post(`${BASE_URL}/employee/verify-otp`, payload)
-        return res.data
-    },
+  createPassword: async (payload: PasswordConfirmationRequest) => {
+    const res = await axios.post(
+      `${BASE_URL}/employee/create-password`,
+      payload,
+    );
+    return res.data;
+  },
 
-    createPassword: async (payload: PasswordConfirmationRequest) => {
-        const res = await axios.post(`${BASE_URL}/employee/create-password`, payload)
-        return res.data
-    },
+  login: async (payload: { username: string; password: string }) => {
+    const res = await axios.post(`${BASE_URL}/v1/login`, payload);
+    const token = res.data.token;
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    return res.data;
+  },
+  userlogin: async (payload: {
+    email: string;
+    password: string;
+    ip: string;
+  }) => {
+    const res = await axios.post(`${BASE_URL}/v1/userlogin`, payload);
 
-    login: async (payload: { username: string; password: string }) => {
-        const res = await axios.post(`${BASE_URL}/v1/login`, payload)
-        const token = res.data.token
-        if (token) {
-            localStorage.setItem("token", token)
-        }
-        return res.data
-    },
-   userlogin: async (payload: { email: string; password: string; ip: string }) => {
-        const res = await axios.post(`${BASE_URL}/v1/userlogin`, payload)
+    const { token, ip_match, user } = res.data;
 
-        const { token, ip_match } = res.data
-
-        if (token) {
-            localStorage.setItem("token", token)
-        }
-
-        localStorage.setItem("ip_match", ip_match ? "true" : "false")
-
-        return res.data
-    },
-
-    user: async () => {
-
-        const token = localStorage.getItem("token")
-
-        const res = await axios.get(`${BASE_URL}/user`, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-
-        return res.data
-    },
-
-    logout: async () => {
-
-        const token = localStorage.getItem("token")
-
-        await axios.post(`${BASE_URL}/logout`, {}, {
-            headers: {
-                Authorization: `Bearer ${token}`
-            }
-        })
-
-        localStorage.removeItem("token")
+    if (token) {
+      localStorage.setItem("token", token);
+    }
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    }
+    if (ip_match) {
+      localStorage.setItem("ip_match", JSON.stringify(ip_match));
+    } else {
+      localStorage.removeItem("ip_match");
     }
 
-}
+    return res.data;
+  },
+
+  user: async () => {
+    const token = localStorage.getItem("token");
+
+    const res = await axios.get(`${BASE_URL}/user`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return res.data;
+  },
+
+  logout: async () => {
+    const token = localStorage.getItem("token");
+
+    await axios.post(
+      `${BASE_URL}/logout`,
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    localStorage.removeItem("token");
+  },
+};
