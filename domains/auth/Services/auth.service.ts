@@ -39,12 +39,17 @@ export const AuthService = {
         }
         return res.data
     },
-    userlogin: async (payload: { email: string; password: string }) => {
+   userlogin: async (payload: { email: string; password: string; ip: string }) => {
         const res = await axios.post(`${BASE_URL}/v1/userlogin`, payload)
-        const token = res.data.token
+
+        const { token, ip_match } = res.data
+
         if (token) {
             localStorage.setItem("token", token)
         }
+
+        localStorage.setItem("ip_match", ip_match ? "true" : "false")
+
         return res.data
     },
 

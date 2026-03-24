@@ -1,12 +1,21 @@
-
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
   const [servicesOpen, setServicesOpen] = useState(false);
+
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = document.cookie
+      .split("; ")
+      .find((row) => row.startsWith("token="));
+
+    setIsLoggedIn(!!token);
+  }, []);
   return (
     <>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -42,12 +51,12 @@ export default function Header() {
               <div className="absolute left-0 top-full mt-3 w-48 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <ul className="py-2 text-sm">
                   <li>
-                    <a
-                      href="/hero/products"
+                    <Link
+                      href="/lawn-lots"
                       className="block px-4 py-2 hover:bg-gray-100"
                     >
                       Lawn Lots
-                    </a>
+                    </Link>
                   </li>
                   <li>
                     <a href="#" className="block px-4 py-2 hover:bg-gray-100">
@@ -111,22 +120,59 @@ export default function Header() {
             </li>
 
             <li>
-              <a href="" className="hover:text-[#34554f] transition">
+              <a href="#footer" className="hover:text-[#34554f] transition">
                 Visit Us
               </a>
             </li>
+            <li>
+              <a href="#" className="hover:text-[#34554f] transition">
+                Check SOA
+              </a>
+            </li>
 
-            <li className="flex gap-3 ml-4">
-              <Link href="/auth/login">
-                <button className="px-4 py-2 bg-[#34554f] text-white rounded hover:bg-[#2b4641] transition">
-                  Login
-                </button>
-              </Link>
-              <Link href="/auth/register">
-                <button className="px-4 py-2 bg-[#34554f] text-white rounded hover:bg-[#2b4641] transition">
-                  Register
-                </button>
-              </Link>
+            <li className="ml-4">
+              {isLoggedIn ? (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      const confirmLogout = confirm("Do you want to log out?");
+                      if (!confirmLogout) return;
+
+                      document.cookie = "token=; Max-Age=0; path=/";
+                      setIsLoggedIn(false);
+                    }}
+                    className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 text-sm"
+                  >
+                    Logout
+                  </button>
+                </div>
+              ) : (
+                <div className="flex gap-3">
+                  <Link href="/auth/login">
+                    <button className="px-4 py-2 bg-[#34554f] text-white rounded">
+                      Login
+                    </button>
+                  </Link>
+                  <Link href="/auth/register">
+                    <button
+                      onClick={() => {
+                        // 🔥 clear all stored data
+                        localStorage.clear();
+                        sessionStorage.clear();
+
+                        // (optional) clear auth token too
+                        document.cookie = "token=; Max-Age=0; path=/";
+
+                        // // redirect
+                        // window.location.href = "/auth/register";
+                      }}
+                      className="px-4 py-2 bg-[#34554f] text-white rounded"
+                    >
+                      Register
+                    </button>
+                  </Link>
+                </div>
+              )}
             </li>
           </ul>
         </nav>

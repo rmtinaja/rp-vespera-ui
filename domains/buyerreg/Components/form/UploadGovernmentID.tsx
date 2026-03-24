@@ -80,6 +80,7 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
       const result = await apiService.verifyId(dto);
       localStorage.setItem("image_base64", result.image_base64);
       localStorage.setItem("id_type", result.id_type);
+      localStorage.setItem("type_of_id", result.type_of_id);
       console.log("Verification success:", result);
       alert("ID verified successfully!");
       nextStep();
