@@ -10,22 +10,22 @@ export default function LoginUserComponent() {
   const router = useRouter();
 
   const [ip, setIp] = useState("");
-   useEffect(() => {
-      const savedData: any = {};
-      for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        if (key) savedData[key] = localStorage.getItem(key);
-      }
-  
-      fetch("https://api.ipify.org?format=json")
-        .then((res) => res.json())
-        .then((data) => {
-          setIp(data.ip);
-        })
-        .catch(() => {
-          setIp("0.0.0.0");
-        });
-    }, []);
+  useEffect(() => {
+    const savedData: any = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key) savedData[key] = localStorage.getItem(key);
+    }
+
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => {
+        setIp(data.ip);
+      })
+      .catch(() => {
+        setIp("0.0.0.0");
+      });
+  }, []);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
