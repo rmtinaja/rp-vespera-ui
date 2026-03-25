@@ -4,7 +4,7 @@ import Link from "next/link";
 import MarbleBlock from "../../dialog/marble-blocks";
 import "../../scss/hero.scss";
 import { ChevronLeft } from "lucide-react";
-export default function LawnLots() {
+export default function Estates() {
   return (
     <section className="lawn h-screen w-full overflow-hidden flex">
       <div className="flex w-full h-full">
@@ -23,32 +23,24 @@ export default function LawnLots() {
           >
             <ChevronLeft className="w-7 h-7 text-white" />
           </button>
-          <h1 className="text-6xl font-bold m-0">LAWN LOT</h1>
+          <h1 className="text-6xl font-bold m-0">ESTATES</h1>
 
           <p className="text-lg my-6 leading-relaxed">
-            Sophisticated space for
-            <br />
-            sacred memory.
+            Your foresight today becomes comfort <br /> for those you cherish tomorrow.
           </p>
 
           <div className="flex flex-col gap-4 lawnlots-buttons ">
             <Link
-              href="lawnlots/regular-lawn"
+              href="estates/family-estate"
               className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white"
             >
-              REGULAR LAWN
+              Family Estate
             </Link>
             <Link
-              href="lawnlots/premium-lawn"
+              href="estates/junior-estate"
               className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white"
             >
-              PREMIUM LAWN
-            </Link>
-            <Link
-              href="lawnlots/super-premium-lawn"
-              className="lot-btn  border border-black px-5 py-3 w-fit transition duration-300 hover:bg-black hover:text-white"
-            >
-              SUPER PREMIUM LAWN
+              Junior Estate
             </Link>
           </div>
         </div>

@@ -6,20 +6,20 @@ import { ChevronLeft, SquareCheckBig } from "lucide-react";
 
 export default function Page() {
   const details = [
-    "Lot Size: 1 meter x 2.5 meters",
-    "Distance from Road: 5 meters",
-    "Vault Capacity: Up to 2 full-body interments",
-    "Bone Remains Capacity: Accommodates up to 8 sets of exhumed bones",
+    "Lot Type: Family Estate",
+    "Lot Size: 6 meter x 10 meters",
+    "Capacity: 18 Vaults",
+    "Description: Two-story building",
   ];
 
   const pricing = [
-    { label: "Spot Cash", value: "44,000" },
-    { label: "20 Years", value: "290" },
-    { label: "10 Years", value: "550" },
-    { label: "7 Years", value: "730" },
-    { label: "5 Years", value: "945" },
-    { label: "3 Years", value: "1,400" },
-    { label: "1 Year", value: "3,850", highlight: true },
+    { label: "Spot Cash", value: "1,250,000" },
+    { label: "20 Years", value: "7,550" },
+    { label: "10 Years", value: "14,500" },
+    { label: "7 Years", value: "19,700" },
+    { label: "5 Years", value: "26,000" },
+    { label: "3 Years", value: "1,40,000" },
+    { label: "1 Year", value: "3,110,000", highlight: true },
   ];
 
   return (
@@ -28,7 +28,7 @@ export default function Page() {
         {/* BACK BUTTON */}
         <button
           onClick={() => {
-            window.location.href = "/hero/products/lawnlots";
+            window.location.href = "/hero/products/estates";
           }}
           className="absolute left-4 top-4 z-20 flex items-center justify-center rounded-full bgAccent p-2 shadow-md transition hover:bg-green-700 lg:left-auto lg:right-8 lg:top-8 lg:p-3"
         >
@@ -48,13 +48,14 @@ export default function Page() {
         <div className="flex w-full flex-col justify-center px-4 pb-10 pt-6 sm:px-6 lg:w-1/2 lg:px-10 lg:py-16">
           {/* TITLE */}
           <h1 className="text-3xl font-bold leading-tight text-black sm:text-4xl lg:text-5xl">
-            Premium Lawn
+            FAMILY ESTATE
           </h1>
 
           {/* DESCRIPTION */}
           <p className="mt-4 text-sm leading-7 text-black/90 sm:text-base lg:mt-6 lg:text-lg">
-            A few steps closer to comfort and care, the Premium Lawn is ideal
-            for families seeking accessible serenity with added distinction.
+            Crafted for families who believe in honoring generations. The Family
+            Estate is a two-story mausoleum designed with legacy, elegance, and
+            enduring care in mind.
           </p>
 
           {/* DETAILS */}
@@ -86,14 +87,14 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="border px-1 py-1">44,000</td>
-                  <td className="border px-1 py-1">290</td>
-                  <td className="border px-1 py-1">550</td>
-                  <td className="border px-1 py-1">730</td>
-                  <td className="border px-1 py-1">945</td>
-                  <td className="border px-1 py-1">1.4k</td>
+                  <td className="border px-1 py-1">1,250,000</td>
+                  <td className="border px-1 py-1">7,550</td>
+                  <td className="border px-1 py-1">14,500</td>
+                  <td className="border px-1 py-1">19,700</td>
+                  <td className="border px-1 py-1">26,000</td>
+                  <td className="border px-1 py-1">40,000</td>
                   <td className="border bg-yellow-400 px-1 py-1 font-bold">
-                    3.85k
+                    110,000
                   </td>
                 </tr>
               </tbody>
@@ -116,14 +117,14 @@ export default function Page() {
               </thead>
               <tbody>
                 <tr className="text-center">
-                  <td className="border px-4 py-3">44,000</td>
-                  <td className="border px-4 py-3">290</td>
-                  <td className="border px-4 py-3">550</td>
-                  <td className="border px-4 py-3">730</td>
-                  <td className="border px-4 py-3">945</td>
-                  <td className="border px-4 py-3">1,400</td>
-                  <td className="border bg-yellow-400 px-4 py-3 font-bold">
-                    3,850
+                  <td className="border px-1 py-1">1,250,000</td>
+                  <td className="border px-1 py-1">7,550</td>
+                  <td className="border px-1 py-1">14,500</td>
+                  <td className="border px-1 py-1">19,700</td>
+                  <td className="border px-1 py-1">26,000</td>
+                  <td className="border px-1 py-1">40,000</td>
+                  <td className="border bg-yellow-400 px-1 py-1 font-bold">
+                    110,000
                   </td>
                 </tr>
               </tbody>
@@ -133,7 +134,7 @@ export default function Page() {
           {/* BUTTON */}
           <div className="mt-8 flex justify-center lg:mt-10 lg:justify-start">
             <button className="lawnlots-buttons lot-btn w-full max-w-[320px] rounded-full border border-black px-6 py-3 text-base font-semibold transition duration-300 hover:bg-black hover:text-white sm:w-fit sm:min-w-[220px] lg:px-8 lg:py-4 lg:text-lg">
-              Reserve Now
+             Avail Now
             </button>
           </div>
         </div>
