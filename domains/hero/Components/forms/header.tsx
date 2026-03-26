@@ -59,12 +59,18 @@ export default function Header() {
                     </Link>
                   </li>
                   <li>
-                    <a href="/hero/products/estates" className="block px-4 py-2 hover:bg-gray-100">
+                    <a
+                      href="/hero/products/estates"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
                       Estates
                     </a>
                   </li>
                   <li>
-                    <a href="/hero/products/community-vault" className="block px-4 py-2 hover:bg-gray-100">
+                    <a
+                      href="/hero/products/community-vault"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
                       Community Vault
                     </a>
                   </li>
@@ -86,7 +92,10 @@ export default function Header() {
               <div className="absolute left-0 top-full mt-3 w-56 bg-white shadow-lg rounded-md opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200">
                 <ul className="py-2 text-sm">
                   <li>
-                    <a href="/hero/services/interment" className="block px-4 py-2 hover:bg-gray-100">
+                    <a
+                      href="/hero/services/interment"
+                      className="block px-4 py-2 hover:bg-gray-100"
+                    >
                       Interment
                     </a>
                   </li>
@@ -104,12 +113,19 @@ export default function Header() {
                 Visit Us
               </a>
             </li>
-            {isLoggedIn ?? (
-              <li>
-                <a href="#" className="hover:text-[#34554f] transition">
-                  Check SOA
-                </a>
-              </li>
+            {isLoggedIn && (
+              <>
+                <li>
+                  <a href="#" className="hover:text-[#34554f] transition">
+                    Check SOA
+                  </a>
+                </li>
+                <li>
+                  <a href="/pa" className="hover:text-[#34554f] transition">
+                    Purchase Agreement
+                  </a>
+                </li>
+              </>
             )}
 
             <li className="ml-4">
