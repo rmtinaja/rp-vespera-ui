@@ -2,32 +2,49 @@
 
 import Link from "next/link"
 import { useNavigation } from "./NavigationProvider"
+import { usePathname } from "next/navigation"
+import { menuConfig } from "@/sharedComponents/config/menuConfig"
 
 export default function Sidebar() {
   const { modules, loading } = useNavigation()
+  const pathname = usePathname()
+
+  const segments = pathname.split("/")
+  const currentPage = segments[2] // treasury
+  const currentSubPage = segments[3] // confirmation (optional)
+
   if (loading) {
     return <div className="p-4">Loading navigation...</div>
   }
+
+  const menu = menuConfig[currentPage] || menuConfig.default
+
   return (
     <div className="sidebar p-4 w-64 bg-accent-rp text-white rounded-md">
-      <Link key="kay1" href="/sample/ok" className="block pl-3 py-2 text-sm hover:bg-[#B18343] duration-200 rounded-md">Sample Link</Link>
-      <Link key="kay2" href="/sample/ok1" className="block pl-3 py-2 text-sm hover:bg-[#B18343] duration-200 rounded-md">Sample Link1</Link>
-      <Link key="kay3" href="/sample/ok2" className="block pl-3 py-2 text-sm hover:bg-[#B18343] duration-200 rounded-md">Sample Link2</Link>
-      <Link key="kay4" href="/sample/ok3" className="block pl-3 py-2 text-sm hover:bg-[#B18343] duration-200 rounded-md">Sample Link3</Link>
-      {/* {modules.map((module) => (
-        <div key={module.id} className="mb-4">
-          <h3 className="font-semibold">
-            {module.module_name}
-          </h3>
-          <div className="mt-2">
-            {module.submodules.map((sub) => (
-              <Link key={sub.id} href={sub.route} className="block pl-3 py-2 text-sm hover:bg-[#B18343] duration-200 rounded-md">
-                {sub.submodule_name}
-              </Link>
-            ))}
-          </div>
-        </div>
-      ))} */}
+      {menu.map((item) => {
+        const Icon = item.icon
+
+        // ✅ active check
+        const isActive = pathname === item.href
+
+        return (
+          <Link
+            key={item.href}
+            href={item.href}
+            className={`flex items-center gap-2 pl-3 py-2 text-sm rounded-md duration-200
+              ${isActive ? "bg-[#B18343]" : "hover:bg-[#B18343]/70"}
+            `}
+          >
+            {Icon && (
+              <Icon
+                size={18}
+                className={isActive ? "text-white" : "text-white/80"}
+              />
+            )}
+            <span>{item.name}</span>
+          </Link>
+        )
+      })}
     </div>
   )
 }
