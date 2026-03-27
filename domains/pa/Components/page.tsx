@@ -13,10 +13,10 @@ type LotWithTerm = {
 export default function PurchaseAgreement() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmedLots, setConfirmedLots] = useState<LotWithTerm[]>([]);
-  const [availableLots, setAvailableLots] = useState<LotWithTerm[]>([]);
   const [paymentTerms, setPaymentTerms] = useState<
     { id: string; label: string; sublabel: string; months: number }[]
   >([]);
+  const [lotTypes, setLotTypes] = useState<{ id: string; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
 
   // ── Fetch dynamic data
@@ -24,20 +24,11 @@ export default function PurchaseAgreement() {
     async function fetchData() {
       setLoading(true);
       try {
-        const [lotsRes, termsRes] = await Promise.all([
-          PurchaseAgreementService.getAvailableLots(),
+        const [termsRes] = await Promise.all([
           PurchaseAgreementService.getAmortTerms(),
         ]);
 
-        // Map lots to include a default term
-        const lotsWithTerm: LotWithTerm[] = lotsRes.data.lots.map((l) => ({
-          ...l,
-          term_id: termsRes.data.amortterm[0]?.mp_i_amort_term.toString() || "",
-        }));
-
-        setAvailableLots(lotsWithTerm);
-
-        // Map amort terms to our structure
+        // ── Map amort terms
         const termsMapped = termsRes.data.amortterm.map((t) => ({
           id: t.mp_i_amort_term.toString(),
           label: t.description,
@@ -159,7 +150,6 @@ export default function PurchaseAgreement() {
         {dialogOpen && !loading && (
           <SelectLotDialog
             initial={confirmedLots}
-            availableLots={availableLots}
             paymentTerms={paymentTerms}
             onConfirm={(lots) => {
               setConfirmedLots(lots);
