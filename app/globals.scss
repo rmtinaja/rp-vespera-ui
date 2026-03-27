@@ -214,7 +214,10 @@ button{
 .projecttable{
   width: 100%;
   td{
-    padding: 8px;
+    padding: 5px;
+  }
+  th{
+    padding: 10px;
   }
   thead th:first-child{
     border-top-left-radius: 10px;

@@ -90,14 +90,21 @@ export async function cancelTransaction(id: number) {
 }
 
 export async function getToConfirm() {
-  const res = await fetch(`${BASE_URL}/transactions/to-confirm`, {
+  const res = await fetch(`${BASE_URL}/transactions/confirmation`, {
+    cache: 'no-store'
+  })
+  return res.json()
+}
+
+export async function toReceipt() {
+  const res = await fetch(`${BASE_URL}/transactions/toreceipt`, {
     cache: 'no-store'
   })
   return res.json()
 }
 
 export async function getPaid() {
-  const res = await fetch(`${BASE_URL}/transactions/paid`, {
+  const res = await fetch(`${BASE_URL}/transactions/done`, {
     cache: 'no-store'
   })
   return res.json()

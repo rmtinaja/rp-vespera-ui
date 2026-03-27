@@ -9,11 +9,13 @@ export default function TransactionList({
   initialPage,
   initialLastPage,
   title,
+  endpoint,
 }: {
   initialData: TransactionDTO[];
   initialPage: number;
   initialLastPage: number;
   title: string;
+  endpoint: string;
 }) {
   const router = useRouter();
 
@@ -22,14 +24,18 @@ export default function TransactionList({
   const [lastPage, setLastPage] = useState(initialLastPage);
   const [loading, setLoading] = useState(false);
 
-  // ⚠️ CLIENT SIDE FETCH → must use API (not service)
   const fetchData = async (pageNumber: number) => {
+    if (pageNumber < 1 || pageNumber > lastPage) return;
+
     try {
       setLoading(true);
 
       const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/transactions/to-confirm?page=${pageNumber}`
+        `${process.env.NEXT_PUBLIC_API_URL}${endpoint}?page=${pageNumber}`
       );
+
+      if (!res.ok) throw new Error("Failed to fetch");
+
       const data = await res.json();
 
       setTransactions(data.data);
@@ -44,7 +50,7 @@ export default function TransactionList({
 
   return (
     <div className="p-4">
-      <h2 className="text-lg font-semibold mb-2">{title}</h2>
+      <h2 className="text-lg font-semibold mb-4">{title}</h2>
 
       <div className="overflow-auto">
         <table className="w-full projecttable">
@@ -61,45 +67,66 @@ export default function TransactionList({
           </thead>
 
           <tbody>
-            {transactions.map((t) => (
-              <tr key={t.id}>
-                <td>{t.id}</td>
-                <td>{t.doc_id}</td>
-                <td>{t.lot_number}</td>
-                <td>₱ {t.total_payment}</td>
-                <td className="text-center">{t.payment_type}</td>
-                <td className="text-center">
-                  {new Date(t.date_encoded).toLocaleDateString()}
-                </td>
-                <td className="text-center">
-                  <button
-                    onClick={() =>
-                      router.push(`/page/treasury/displayTransactionView/${t.id}`)
-                    }
-                    className="bg-blue-500 text-white px-3 py-1 rounded"
-                  >
-                    View
-                  </button>
+            {loading ? (
+              <tr>
+                <td colSpan={7} className="text-center py-4">
+                  Loading...
                 </td>
               </tr>
-            ))}
+            ) : transactions.length === 0 ? (
+              <tr>
+                <td colSpan={7} className="text-center py-4">
+                  No data found
+                </td>
+              </tr>
+            ) : (
+              transactions.map((t) => (
+                <tr key={t.id}>
+                  <td>{t.id}</td>
+                  <td>{t.doc_id}</td>
+                  <td>{t.lot_number}</td>
+                  <td>₱ {t.total_payment}</td>
+                  <td className="text-center">{t.payment_type}</td>
+                  <td className="text-center">
+                    {new Date(t.date_encoded).toLocaleDateString()}
+                  </td>
+                  <td className="text-center">
+                    <button
+                      onClick={() =>
+                        router.push(
+                          `/page/treasury/displayTransactionView/${t.id}`
+                        )
+                      }
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                    >
+                      View
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
 
-      {/* PAGINATION */}
-      <div className="flex gap-2 mt-4 items-center">
-        <button onClick={() => fetchData(page - 1)} disabled={page === 1}>
+      {/* Pagination */}
+      <div className="flex gap-4 mt-4 items-center justify-center">
+        <button
+          onClick={() => fetchData(page - 1)}
+          disabled={page === 1 || loading}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+        >
           Prev
         </button>
 
         <span>
-          Page {page} / {lastPage}
+          Page {page} of {lastPage}
         </span>
 
         <button
           onClick={() => fetchData(page + 1)}
-          disabled={page === lastPage}
+          disabled={page === lastPage || loading}
+          className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
         >
           Next
         </button>

@@ -1,8 +1,8 @@
 import TransactionList from "@/domains/treasury/Components/InProgressListComponents";
-import { getToConfirm } from "@/domains/treasury/Services/transaction.service";
+import { getPaid } from "@/domains/treasury/Services/transaction.service";
 
-export default async function CompleteComponent() {
-  const res = await getToConfirm(); // ✅ SERVICE USED HERE (SERVER)
+export default async function PaidPage() {
+  const res = await getPaid();
 
   return (
     <TransactionList
@@ -10,6 +10,7 @@ export default async function CompleteComponent() {
       initialPage={res.current_page}
       initialLastPage={res.last_page}
       title="Paid Transactions"
+      endpoint="/transactions/done"
     />
   );
 }

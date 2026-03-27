@@ -12,7 +12,7 @@ import { CheckCheck, PenSquare, X } from 'lucide-react'
 export default function DisplayInformation({ id }: { id: string }) {
   const [transaction, setTransaction] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-
+  const [showFullImage, setShowFullImage] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [avc, setAvc] = useState('')
   const [or, setOr] = useState('')
@@ -95,46 +95,40 @@ export default function DisplayInformation({ id }: { id: string }) {
     <>
       <div className="bg-white rounded-lg">
         
-        {/* ACTION BUTTONS */}
         <div className='pb-3 flex flex-row gap-2 justify-end'>
-          
-          <button 
-            onClick={handleConfirm}
-            disabled={loading || transaction.confirmed_by}
-            className='btn-primary btn-ico'
-          >
-            <CheckCheck className='w-5'/>
-            {loading ? 'Confirming...' : 'Confirm'}
-          </button>
+        {!transaction.cancelled && !transaction.confirmed_by && !transaction.set_paid && (
+          <>
+            <button 
+              onClick={handleConfirm}
+              disabled={loading}
+              className='btn-primary btn-ico'
+            >
+              <CheckCheck className='w-5'/>
+              {loading ? 'Confirming...' : 'Confirm'}
+            </button>
 
-          <button 
-            onClick={() => setShowEditModal(true)}
-            disabled={transaction.cancelled}
-            className='btn-info btn-ico'
-          >
-            <PenSquare className='w-5'/> Edit
-          </button>
+            <button 
+              onClick={handleCancel}
+              disabled={loading}
+              className='btn-danger btn-ico'
+            >
+              <X className='w-5' /> Cancel
+            </button>
+          </>
+        )}
 
-          <button 
-            onClick={handleCancel}
-            disabled={transaction.cancelled}
-            className='btn-danger btn-ico'
-          >
-            <X className='w-5' /> Cancel
-          </button>
-
-        </div>
-
-        {/* CONTENT */}
+        {!transaction.cancelled && transaction.confirmed_by && !transaction.set_paid && (
+          <>
+            <button onClick={() => setShowEditModal(true)} className='btn-info btn-ico' >
+              <PenSquare className='w-5'/> Set Paid
+            </button>
+          </>
+        )}
+      </div>
         <div className="grid grid-cols-2 gap-2">
-
-          {/* LEFT */}
           <div className='flex flex-col rounded-xl p-5 gap-2 shadow-[0px_-1px_12px_6px_rgba(0,_0,_0,_0.1)]'>
-            
             <div className='flex flex-row justify-between items-center w-full'>
               <h2 className="text-lg font-semibold">Transaction Details</h2>
-
-              {/* STATUS */}
               <span className={`p-1 rounded-full px-5 text-white text-sm ${
                 transaction.cancelled ? 'bg-red-500' :
                 transaction.set_paid ? 'bg-green-600' :
@@ -199,7 +193,7 @@ export default function DisplayInformation({ id }: { id: string }) {
               />
             </div>
 
-            <button className='bg-accent-rp mt-2 px-4 py-2 rounded text-white'>
+            <button  onClick={() => setShowFullImage(true)} className='bg-accent-rp mt-2 px-4 py-2 rounded text-white'>
               View Full
             </button>
           </div>
@@ -248,6 +242,15 @@ export default function DisplayInformation({ id }: { id: string }) {
 
             </div>
           </div>
+        </div>
+      )}
+      {showFullImage && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setShowFullImage(false)}>
+          <img
+            src={`http://localhost:8000/storage/${transaction.attachment}`}
+            alt="full"
+            className="max-h-[95%] max-w-[95%] object-contain rounded-lg shadow-xl"
+          />
         </div>
       )}
     </>
