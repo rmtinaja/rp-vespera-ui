@@ -497,3 +497,55 @@ html {
     padding: 11px 16px;
   }
 }
+
+// ESTATE DESIGN
+.image-animate {
+  display: inline-block;
+
+  animation: appleEntrance 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+
+  /* smoother rendering */
+  will-change: transform, opacity;
+}
+
+/* Entrance animation */
+@keyframes appleEntrance {
+  0% {
+    transform: translateX(120px) rotate(4deg) scale(0.98);
+    opacity: 0;
+    filter: blur(6px);
+  }
+  60% {
+    transform: translateX(-10px) rotate(-0.5deg) scale(1.01);
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    transform: translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+/* Subtle floating effect (like Apple pages) */
+.image-animate {
+  animation:
+    appleEntrance 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+    floatIdle 6s ease-in-out 1.6s infinite;
+}
+
+/* Floating loop */
+@keyframes floatIdle {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Hover = very subtle */
+.image-animate:hover {
+  transform: scale(1.02);
+  transition: transform 0.4s ease;
+}
