@@ -20,6 +20,12 @@ function buildPaymentFormData(dto: SubmitPaymentDTO): FormData {
     if (dto.notes !== undefined) {
         formData.append("notes", dto.notes);
     }
+    if (dto.name !== undefined) {
+        formData.append("name", dto.name);
+    }
+    if (dto.date_deposited !== undefined) {
+        formData.append("date_deposited", dto.date_deposited);
+    }
     formData.append("lots", JSON.stringify(dto.lots));
     return formData;
 }

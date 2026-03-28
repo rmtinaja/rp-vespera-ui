@@ -169,8 +169,30 @@ export default function DisplayInformation({ id }: { id: string }) {
                   <td>{transaction.payment_type}</td>
                 </tr>
                 <tr>
-                  <td>Date</td>
-                  <td>{transaction.date_encoded}</td>
+                  <td>Date of Payment</td>
+                  <td>{transaction.date_deposited}</td>
+                </tr>
+                <tr>
+                  <td>Date Encoded</td>
+                  <td>
+                    {new Date(transaction.date_encoded)
+                      .toLocaleString('en-GB', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        hour12: false
+                      })}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Description</td>
+                  <td>{transaction.description}</td>
+                </tr>
+                <tr>
+                  <td>Notes</td>
+                  <td>{transaction.notes}</td>
                 </tr>
               </tbody>
             </table>

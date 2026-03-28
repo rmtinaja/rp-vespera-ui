@@ -7,6 +7,9 @@ export default function ConfirmationPage() {
 
   const handleProceed = () => {
     router.push("/");
+    sessionStorage.removeItem('CurrentForm');
+    sessionStorage.removeItem('PaymentOption');
+    sessionStorage.removeItem('verifiedCustomer');
   };
 
   return (

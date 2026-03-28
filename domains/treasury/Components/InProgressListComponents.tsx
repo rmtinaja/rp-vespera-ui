@@ -60,6 +60,12 @@ export default function TransactionList({
               <th>Doc ID</th>
               <th>Lot</th>
               <th>Total</th>
+              {title == "Paid Transactions" &&
+                <>
+                  <th>AVC Receipt</th>
+                  <th>OR Receipt</th>
+                </>
+              }
               <th className="text-center">Payment</th>
               <th className="text-center">Date</th>
               <th className="text-center">Action</th>
@@ -86,6 +92,12 @@ export default function TransactionList({
                   <td>{t.doc_id}</td>
                   <td>{t.lot_number}</td>
                   <td>₱ {t.total_payment}</td>
+                  {title == "Paid Transactions" &&
+                    <>
+                      <td>{t.avc_receipt_no}</td>
+                      <td>{t.official_receipt_no}</td>
+                    </>
+                  }
                   <td className="text-center">{t.payment_type}</td>
                   <td className="text-center">
                     {new Date(t.date_encoded).toLocaleDateString()}

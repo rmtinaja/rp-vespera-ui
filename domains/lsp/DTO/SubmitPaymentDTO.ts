@@ -14,4 +14,6 @@ export interface SubmitPaymentDTO {
     lots: SubmitPaymentLotDTO[];
     description?: string;
     notes?: string;   
+    name?: string;   
+    date_deposited?: string;   
 }
