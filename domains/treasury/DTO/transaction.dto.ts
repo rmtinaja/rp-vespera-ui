@@ -1,4 +1,6 @@
 export interface TransactionDTO {
+  official_receipt_no: string;
+  avc_receipt_no: string;
   id: number;
   doc_id: string;
   date_encoded: string;

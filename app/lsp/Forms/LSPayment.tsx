@@ -33,6 +33,7 @@ export default function LSPayment({ nextPage }: Props) {
 
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [referenceNumber, setReferenceNumber] = useState("");
+  const [date_deposited, setdate_deposited] = useState("");
   const [aiReading, setAiReading] = useState(false);
 
   // ---------------- FETCH LOTS ----------------
@@ -84,6 +85,7 @@ export default function LSPayment({ nextPage }: Props) {
 
       if (result.success) {
         setReferenceNumber(result.referenceNumber || "");
+        setdate_deposited(result.date_deposited || "");
         setPaymentAmount(Number(result.amount) || 0);
       } else {
         alert(result.error || "AI extraction failed");
@@ -210,6 +212,7 @@ export default function LSPayment({ nextPage }: Props) {
       const stored = sessionStorage.getItem("verifiedCustomer");
       const parsed = stored ? JSON.parse(stored) : null;
       const phoneNumber = parsed?.data?.phone;
+      const name = parsed?.data?.name1;
 
       if (!phoneNumber || !ownerId || !purchaserId) {
         alert("Missing required customer data.");
@@ -253,9 +256,10 @@ export default function LSPayment({ nextPage }: Props) {
         lots: formattedLots,
         description,
         notes,
+        name: name,
+        date_deposited: date_deposited,
+        
       };
-
-      // 🔥 MERGE IMPLEMENTATION HERE
       const isMergedMode = allocationType === "allocate";
 
       const result = await PaymentService.submitPayment(dto, isMergedMode);
