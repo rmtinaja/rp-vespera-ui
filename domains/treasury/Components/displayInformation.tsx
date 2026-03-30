@@ -9,6 +9,8 @@ import {
 } from '@/domains/treasury/Services/transaction.service'
 import { CheckCheck, PenSquare, X } from 'lucide-react'
 
+const IMG_PUBLIC_URL = process.env.NEXT_PUBLIC_IMG_URL || 'http://localhost:8000'
+
 export default function DisplayInformation({ id }: { id: string }) {
   const [transaction, setTransaction] = useState<any>(null)
   const [loading, setLoading] = useState(false)
@@ -203,13 +205,13 @@ export default function DisplayInformation({ id }: { id: string }) {
             <div className="relative w-full h-[500px] flex items-center justify-center overflow-hidden rounded-lg">
               
               <img 
-                src={`http://localhost:8000/storage/${transaction.attachment}`} 
+                src={`${IMG_PUBLIC_URL}/storage/${transaction.attachment}`} 
                 alt="bg" 
                 className="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50"
               />
 
               <img 
-                src={`http://localhost:8000/storage/${transaction.attachment}`} 
+                src={`${IMG_PUBLIC_URL}/storage/${transaction.attachment}`} 
                 alt="payment" 
                 className="relative z-10 max-h-full max-w-[80%] object-contain rounded-md shadow-lg"
               />
@@ -269,7 +271,7 @@ export default function DisplayInformation({ id }: { id: string }) {
       {showFullImage && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50" onClick={() => setShowFullImage(false)}>
           <img
-            src={`http://localhost:8000/storage/${transaction.attachment}`}
+            src={`${IMG_PUBLIC_URL}/storage/${transaction.attachment}`} 
             alt="full"
             className="max-h-[95%] max-w-[95%] object-contain rounded-lg shadow-xl"
           />
