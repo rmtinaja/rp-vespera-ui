@@ -17,4 +17,6 @@ export interface TransactionDTO {
   lot_number: string;
   notes: string;
   is_merged: number;
+  name?: string;
+  reference_number?: number;
 }

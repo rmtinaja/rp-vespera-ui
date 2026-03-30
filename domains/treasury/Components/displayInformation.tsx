@@ -150,6 +150,10 @@ export default function DisplayInformation({ id }: { id: string }) {
                   <td>{transaction.organization}</td>
                 </tr>
                 <tr>
+                  <td>Reference No.</td>
+                  <td>{transaction.reference_number}</td>
+                </tr>
+                <tr>
                   <td>Name</td>
                   <td>{transaction.name}</td>
                 </tr>
