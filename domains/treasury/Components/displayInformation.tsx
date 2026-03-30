@@ -24,13 +24,10 @@ export default function DisplayInformation({ id }: { id: string }) {
   async function loadData() {
     const data = await getTransactionById(id)
     setTransaction(data)
-
-    // autofill if existing
     setAvc(data.avc_receipt_no || '')
     setOr(data.official_receipt_no || '')
   }
 
-  // ✅ CONFIRM
   async function handleConfirm() {
     try {
       setLoading(true)

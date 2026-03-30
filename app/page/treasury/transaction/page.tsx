@@ -10,7 +10,7 @@ export default async function CancelledPage() {
       initialPage={res.current_page}
       initialLastPage={res.last_page}
       title="For Receipt"
-      endpoint="/transactions/toReceipt"
+      endpoint="/transactions/toreceipt"
     />
   );
 }
