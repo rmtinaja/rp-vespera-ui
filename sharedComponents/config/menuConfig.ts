@@ -26,7 +26,6 @@ export const menuConfig: MenuConfig = {
     { name: "Transaction", href: "/page/treasury/transaction", icon: Receipt },
     { name: "Complete", href: "/page/treasury/complete", icon: CheckCircle },
     { name: "Cancelled", href: "/page/treasury/cancelled", icon: XCircle },
-    { name: "Settings", href: "/admin/settings", icon: Settings },
   ],
   admin: [
     { name: "Users", href: "/admin/users", icon: Users },
