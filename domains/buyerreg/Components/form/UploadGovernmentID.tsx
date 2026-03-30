@@ -14,8 +14,8 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
   const [loading, setLoading] = useState(false);
   const [sessionData, setSessionData] = useState<any>({});
   const apiService = new ApiService();
-  // Generate preview when file changes
 
+  // Load session data from localStorage
   useEffect(() => {
     const data = {
       firstName: localStorage.getItem("firstName") || "",
@@ -32,6 +32,8 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
     };
     setSessionData(data);
   }, []);
+
+  // Generate preview when file changes
   useEffect(() => {
     if (form.govId) {
       const reader = new FileReader();
@@ -42,7 +44,7 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
     }
   }, [form.govId]);
 
-  // Handle file selection
+  // Handle file selection (upload or camera)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
 
@@ -99,17 +101,29 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
       </h2>
 
       <p className="text-xs text-gray-500 mb-2">
-        Upload any valid government ID (front only is enough to start).
+        Upload any valid government ID (front only is enough to start) or capture a new one.
       </p>
 
-      <div>
-        {/* ID Upload */}
+      <div className="space-y-2">
+        {/* File Upload */}
         <label className="block text-sm font-medium text-gray-700">
-          ID Upload <span className="text-red-500">*</span>
+          Upload from device
         </label>
         <input
           type="file"
           accept="image/jpeg,image/png"
+          onChange={handleChange}
+          className="bg-white mt-1 w-full rounded-lg border-gray-300 px-3 py-2"
+        />
+
+        {/* Capture using camera */}
+        <label className="block text-sm font-medium text-gray-700 mt-3">
+          Capture from camera
+        </label>
+        <input
+          type="file"
+          accept="image/*"
+          capture="environment"
           onChange={handleChange}
           className="bg-white mt-1 w-full rounded-lg border-gray-300 px-3 py-2"
         />
