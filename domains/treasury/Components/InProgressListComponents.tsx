@@ -58,8 +58,8 @@ export default function TransactionList({
             <tr>
               <th>ID</th>
               <th>Doc ID</th>
-              <th>Reference Number</th>
               <th>Name</th>
+              <th>Reference Number</th>
               <th>Lot</th>
               <th>Total</th>
               {title == "Paid Transactions" &&
