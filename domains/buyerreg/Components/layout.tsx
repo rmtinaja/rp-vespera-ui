@@ -9,7 +9,7 @@ export default function RegisterLayout({
   return (
     <div className="grid min-h-screen grid-cols-1 lg:grid-cols-2">
       {/* Left Side - Form / Image */}
-      <div className="relative overflow-hidden w-full h-64 lg:h-auto lg:block">
+      <div className="relative overflow-hidden w-full h-64 lg:h-auto lg:block hidden">
         <img
           src="/assets/images/learn_more_2_3.jpg"
           className="absolute inset-0 w-full h-full object-cover brightness-85 blur-[2px] scale-105"

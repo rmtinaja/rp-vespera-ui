@@ -4,6 +4,10 @@ import {
   GetAvailableLotsRequest,
   LotTypeResponse,
   AmortTermResponse,
+  CheckLotResponse,
+  CheckLotParams,
+  CheckAmortizationParams,
+  CheckAmortizationResponse,
 } from "../DTO/pa.dto";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -21,6 +25,18 @@ export const PurchaseAgreementService = {
   },
   getAmortTerms: async (): Promise<AmortTermResponse> => {
     const res = await axios.get(`${BASE_URL}/pa/amortterm`);
+    return res.data;
+  },
+  checkAvailability: async (
+    params: CheckLotParams,
+  ): Promise<CheckLotResponse> => {
+    const res = await axios.get(`${BASE_URL}/pa/check-lot`, { params });
+    return res.data;
+  },
+  checkAmortization: async (
+    params: CheckAmortizationParams,
+  ): Promise<CheckAmortizationResponse> => {
+    const res = await axios.get(`${BASE_URL}/pa/calculate-pricing`, { params });
     return res.data;
   },
 };

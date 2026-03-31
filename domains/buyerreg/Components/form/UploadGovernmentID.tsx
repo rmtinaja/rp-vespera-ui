@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "primereact/button";
 import { ApiService } from "../../Services/ApiService";
 import { VerifyIdDTO } from "../../DTO/BuyerRegDTO";
+import { Camera, Upload } from "lucide-react";
 
 interface Step5Props {
   nextStep: () => void;
@@ -101,33 +102,47 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
       </h2>
 
       <p className="text-xs text-gray-500 mb-2">
-        Upload any valid government ID (front only is enough to start) or capture a new one.
+        Upload any valid government ID (front only is enough to start) or
+        capture a new one.
       </p>
 
-      <div className="space-y-2">
-        {/* File Upload */}
-        <label className="block text-sm font-medium text-gray-700">
-          Upload from device
-        </label>
-        <input
-          type="file"
-          accept="image/jpeg,image/png"
-          onChange={handleChange}
-          className="bg-white mt-1 w-full rounded-lg border-gray-300 px-3 py-2"
-        />
+      <div className="space-x-4">
+        {/* File Upload Icon */}
+        <div className="flex flex-row justify-between">
+          <div>
+            <input
+              id="file-input"
+              type="file"
+              accept="image/jpeg,image/png"
+              onChange={handleChange}
+              className="hidden"
+            />
+            <label
+              htmlFor="file-input"
+              className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200"
+            >
+              <Upload className="w-6 h-6 text-gray-700" />
+            </label>
+          </div>
 
-        {/* Capture using camera */}
-        <label className="block text-sm font-medium text-gray-700 mt-3">
-          Capture from camera
-        </label>
-        <input
-          type="file"
-          accept="image/*"
-          capture="environment"
-          onChange={handleChange}
-          className="bg-white mt-1 w-full rounded-lg border-gray-300 px-3 py-2"
-        />
-
+          {/* Camera Capture Icon */}
+          <div>
+            <input
+              id="camera-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleChange}
+              className="hidden"
+            />
+            <label
+              htmlFor="camera-input"
+              className="flex items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200"
+            >
+              <Camera className="w-6 h-6 text-gray-700" />
+            </label>
+          </div>
+        </div>
         {/* Preview */}
         {preview && (
           <img

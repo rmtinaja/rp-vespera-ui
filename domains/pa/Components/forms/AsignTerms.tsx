@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { PurchaseAgreementService } from "../../Services/pa.service";
 
 type Lot = { lottype_name: string; lot_available: string };
 type PaymentTerm = {
@@ -17,28 +18,63 @@ function termById(id: string, paymentTerms: PaymentTerm[]) {
   return paymentTerms.find((t) => t.id === id);
 }
 
+// Session storage key for selected terms
+const SESSION_KEY_TERMS = "assignedTerms";
+
 export default function AssignTerms({
   lots,
   initialTerms,
   onBack,
   onConfirm,
   onClose,
-  paymentTerms, // Receive dynamic payment terms from parent
+  paymentTerms,
 }: {
   lots: Lot[];
   initialTerms: Record<string, string>;
   onBack: () => void;
   onConfirm: (terms: Record<string, string>) => void;
   onClose: () => void;
-  paymentTerms: PaymentTerm[]; // Dynamic payment terms from API
+  paymentTerms: PaymentTerm[];
 }) {
-  const [terms, setTerms] = useState<Record<string, string>>(initialTerms);
+  // Load from sessionStorage if exists, otherwise initialTerms
+  const savedTerms = sessionStorage.getItem(SESSION_KEY_TERMS);
+  const [terms, setTerms] = useState<Record<string, string>>(
+    savedTerms ? JSON.parse(savedTerms) : initialTerms,
+  );
+
   const [applyAll, setApplyAll] = useState<string>("");
 
-  function setTerm(lotId: string, termId: string) {
-    setTerms((prev) => ({ ...prev, [lotId]: termId }));
-  }
+  // Persist terms in sessionStorage whenever changed
+  useEffect(() => {
+    sessionStorage.setItem(SESSION_KEY_TERMS, JSON.stringify(terms));
+  }, [terms]);
 
+  async function setTerm(lotKey: string, termId: string) {
+    setTerms((prev) => ({ ...prev, [lotKey]: termId }));
+    setApplyAll("");
+
+    // Find the selected lot
+    const selectedLot = lots.find((l) => l.lot_available === lotKey);
+
+    if (!selectedLot) return;
+
+    const params = {
+      lot_id: (selectedLot as any).lot_id, // make sure lot_id exists in type
+      amort_term_id: Number(termId),
+      payment_scheme_id: 1,
+    };
+
+    try {
+      console.log(params);
+      const res = await PurchaseAgreementService.checkAmortization(params);
+      console.log("API Response:", res);
+
+      // OPTIONAL: store per lot result
+      sessionStorage.setItem(`pricing_${lotKey}`, JSON.stringify(res.data));
+    } catch (err) {
+      console.error("Failed to fetch amortization:", err);
+    }
+  }
   function handleApplyAll(termId: string) {
     setApplyAll(termId);
     const updated: Record<string, string> = {};
@@ -52,14 +88,6 @@ export default function AssignTerms({
 
   return (
     <>
-      {/* Meta */}
-      <div className="flex items-center justify-between px-[1.75rem] py-[0.5rem] bg-[#faf8f4] border-b border-[#e8e3da] flex-shrink-0">
-        <span className="text-[0.72rem] text-[#8a7e6e] tracking-[0.5px]">
-          Assign a payment term of the selected lot
-          {lots.length !== 1 ? "s" : ""}
-        </span>
-      </div>
-
       {/* Per-lot term cards */}
       <div className="overflow-y-auto flex-1 px-[1.75rem] py-[1.2rem]">
         <div className="flex flex-col gap-[0.9rem]">
@@ -96,10 +124,7 @@ export default function AssignTerms({
                   <select
                     className="w-full text-[0.78rem] border-[1.5px] rounded-[8px] px-[0.65rem] py-[0.55rem] transition-all bg-[#faf8f4] border-[#e0dbd1] focus:border-[#2d7a4f] focus:bg-[#edf7f2]"
                     value={selectedTerm || ""}
-                    onChange={(e) => {
-                      setTerm(lot.lot_available, e.target.value);
-                      setApplyAll("");
-                    }}
+                    onChange={(e) => setTerm(lot.lot_available, e.target.value)}
                   >
                     <option value="" disabled>
                       Select Payment Term
@@ -116,6 +141,7 @@ export default function AssignTerms({
           })}
         </div>
       </div>
+
       {/* Footer */}
       <div className="flex items-center justify-between gap-[1rem] px-[1.75rem] py-[0.9rem] border-t border-[#e8e3da] bg-[#f5f1eb] flex-shrink-0">
         <button
