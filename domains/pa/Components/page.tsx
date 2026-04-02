@@ -198,24 +198,22 @@ export default function PurchaseAgreement() {
               disabled={!s.canClick || loading}
               onClick={() => s.canClick && !loading && openDialog(s.num)}
               className={`w-full flex items-center gap-3 p-3 rounded-lg border-[1.5px] text-left transition-all
-                ${
-                  s.done
-                    ? "border-[#b28648] bg-[#fef8f2] hover:bg-[#fdf3e7]"
-                    : currentStep === s.num
-                      ? "border-[#060503] bg-[#f5f1eb] hover:bg-[#ede9e2]"
-                      : s.canClick
-                        ? "border-[#d6d3d1] bg-white hover:bg-[#f5f5f3] hover:border-[#060503]"
-                        : "border-[#d6d3d1] bg-[#f9f9f9] opacity-50 cursor-not-allowed"
+                ${s.done
+                  ? "border-[#b28648] bg-[#fef8f2] hover:bg-[#fdf3e7]"
+                  : currentStep === s.num
+                    ? "border-[#060503] bg-[#f5f1eb] hover:bg-[#ede9e2]"
+                    : s.canClick
+                      ? "border-[#d6d3d1] bg-white hover:bg-[#f5f5f3] hover:border-[#060503]"
+                      : "border-[#d6d3d1] bg-[#f9f9f9] opacity-50 cursor-not-allowed"
                 }`}
             >
               <div
                 className={`w-9 h-9 flex-shrink-0 flex items-center justify-center font-mono text-sm font-semibold rounded-full border-[1.5px] transition-colors
-                  ${
-                    currentStep === s.num && s.canClick
-                      ? "bg-[#060503] border-[#060503] text-[#b28648]"
-                      : s.done
-                        ? "bg-[#b28648] border-[#b28648] text-white"
-                        : "bg-[#f7f7f7] border-[#d6d3d1] text-[#6b6b6b]"
+                  ${currentStep === s.num && s.canClick
+                    ? "bg-[#060503] border-[#060503] text-[#b28648]"
+                    : s.done
+                      ? "bg-[#b28648] border-[#b28648] text-white"
+                      : "bg-[#f7f7f7] border-[#d6d3d1] text-[#6b6b6b]"
                   }`}
               >
                 {s.done ? "✔" : `0${s.num}`}
@@ -223,12 +221,11 @@ export default function PurchaseAgreement() {
               <div className="flex-1 min-w-0">
                 <span
                   className={`block text-[0.875rem] font-sans font-semibold
-                    ${
-                      currentStep === s.num
-                        ? "text-[#060503]"
-                        : s.done
-                          ? "text-[#b28648]"
-                          : "text-[#6b6b6b]"
+                    ${currentStep === s.num
+                      ? "text-[#060503]"
+                      : s.done
+                        ? "text-[#b28648]"
+                        : "text-[#6b6b6b]"
                     }`}
                 >
                   {s.label}

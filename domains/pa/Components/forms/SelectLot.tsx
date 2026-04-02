@@ -1,11 +1,12 @@
 import { useState, useEffect } from "react";
 import { PurchaseAgreementService } from "../../Services/pa.service";
+import Loading from "../dialogs/Loading";
 
 const MAX_LOTS = 1;
 const SESSION_KEY_LOTS = "selectedLots";
 const SESSION_KEY_INPUTS = "lotInputs";
 
-type Lot = { lottype_name: string; lot_available: string; lot_id: string };
+type Lot = { lottype_name: string; lot_available: string; lot_id?: string };
 
 export default function StepSelectLots({
   initial,
@@ -21,7 +22,7 @@ export default function StepSelectLots({
   const initialInputs = savedInputs
     ? JSON.parse(savedInputs)
     : { area: "", block: "", lotNo: "" };
-
+  const [adding, setAdding] = useState(false);
   const [area, setArea] = useState(initialInputs.area);
   const [block, setBlock] = useState(initialInputs.block);
   const [lotNo, setLotNo] = useState(initialInputs.lotNo);
@@ -75,7 +76,7 @@ export default function StepSelectLots({
 
   async function handleAdd() {
     setFieldError(null);
-
+    setAdding(true);
     if (!area.trim() || !block.trim() || !lotNo.trim()) {
       setFieldError("Please fill in all fields.");
       return;
@@ -123,8 +124,10 @@ export default function StepSelectLots({
       console.error("Error checking lot:", err);
       setFieldError(
         err.response?.data?.message ||
-          "Failed to check lot availability. Try again.",
+        "Failed to check lot availability. Try again.",
       );
+    } finally {
+      setAdding(false);
     }
   }
 
@@ -135,134 +138,132 @@ export default function StepSelectLots({
   return (
     <>
       {/* Body */}
-      <div className="flex-1 overflow-y-auto px-[1.75rem] py-[1.4rem] bg-[#f5f1eb]">
-        {/* Lot Type Selector */}
-        <div className="mb-[1.2rem]">
-          <label className="block text-[0.7rem] tracking-[1.2px] uppercase text-[#5a5040] font-semibold mb-[0.45rem]">
-            Lot Type
-          </label>
-          {loading ? (
-            <div className="flex items-center gap-2 text-[#8a7e6e] text-sm">
-              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#1a1a2e]" />
-              Loading...
-            </div>
-          ) : error ? (
-            <p className="text-red-500 text-sm">{error}</p>
-          ) : (
-            <select
-              value={selectedType}
-              onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-[0.85rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] font-medium cursor-pointer hover:border-[#1a1a2e] transition-colors outline-none focus:border-[#1a1a2e]"
-            >
-              {lotTypes.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+      <div className={`relative flex-1 overflow-y-auto px-[1.75rem] py-[1.4rem] bg-[#f5f1eb] ${adding ? "pointer-events-none" : ""}`}>
+        {adding && <Loading text="Checking lot availability..." />}
+        {pending.length === 0 && (
+          <>
+            <div className="mb-[1.2rem]">
+              <label className="block text-[0.7rem] tracking-[1.2px] uppercase text-[#5a5040] font-semibold mb-[0.45rem]">
+                Lot Type
+              </label>
 
-        {/* Structured Lot Input */}
-        <div className="mb-[0.6rem]">
-          <label className="block text-[0.7rem] tracking-[1.2px] uppercase text-[#5a5040] font-semibold mb-[0.45rem]">
-            Lot Number
-          </label>
-          <div className="flex items-stretch gap-[0.5rem]">
-            {/* Area */}
-            <div className="flex-1 flex flex-col gap-[0.3rem]">
-              <input
-                type="text"
-                placeholder="Area"
-                value={area}
-                onChange={(e) => setArea(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full px-[0.75rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] outline-none placeholder:text-[#b0a898] focus:border-[#1a1a2e] transition-colors"
-              />
-              <span className="text-[0.6rem] text-[#8a7e6e] text-center tracking-[0.5px]">
-                Area
-              </span>
+              {loading ? (
+                <div className="flex items-center gap-2 text-[#8a7e6e] text-sm">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-[#1a1a2e]" />
+                  Loading...
+                </div>
+              ) : error ? (
+                <p className="text-red-500 text-sm">{error}</p>
+              ) : (
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="w-full px-[0.85rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] font-medium cursor-pointer hover:border-[#1a1a2e] transition-colors outline-none focus:border-[#1a1a2e]"
+                >
+                  {lotTypes.map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.name}
+                    </option>
+                  ))}
+                </select>
+              )}
             </div>
 
-            <div className="flex items-center pb-[1.3rem]">
-              <span className="text-[#b0a898] font-bold text-lg leading-none">
-                –
-              </span>
+            {/* Structured Lot Input */}
+            <div className="mb-[0.6rem]">
+              <label className="block text-[0.7rem] tracking-[1.2px] uppercase text-[#5a5040] font-semibold mb-[0.45rem]">
+                Lot Number
+              </label>
+
+              <div className="flex items-stretch gap-[0.5rem]">
+                {/* Area */}
+                <div className="flex-1 flex flex-col gap-[0.3rem]">
+                  <input
+                    type="text"
+                    placeholder="Area"
+                    value={area}
+                    onChange={(e) => setArea(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full px-[0.75rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] outline-none placeholder:text-[#b0a898] focus:border-[#1a1a2e] transition-colors"
+                  />
+                  <span className="text-[0.6rem] text-[#8a7e6e] text-center tracking-[0.5px]">
+                    Area
+                  </span>
+                </div>
+
+                <div className="flex items-center pb-[1.3rem]">
+                  <span className="text-[#b0a898] font-bold text-lg leading-none">–</span>
+                </div>
+
+                {/* Block */}
+                <div className="flex-1 flex flex-col gap-[0.3rem]">
+                  <input
+                    type="text"
+                    placeholder="Block"
+                    value={block}
+                    onChange={(e) => setBlock(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full px-[0.75rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] outline-none placeholder:text-[#b0a898] focus:border-[#1a1a2e] transition-colors"
+                  />
+                  <span className="text-[0.6rem] text-[#8a7e6e] text-center tracking-[0.5px]">
+                    Block
+                  </span>
+                </div>
+
+                <div className="flex items-center pb-[1.3rem]">
+                  <span className="text-[#b0a898] font-bold text-lg leading-none">–</span>
+                </div>
+
+                {/* Lot No */}
+                <div className="flex-1 flex flex-col gap-[0.3rem]">
+                  <input
+                    type="text"
+                    placeholder="Lot No."
+                    value={lotNo}
+                    onChange={(e) => setLotNo(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full px-[0.75rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] outline-none placeholder:text-[#b0a898] focus:border-[#1a1a2e] transition-colors"
+                  />
+                  <span className="text-[0.6rem] text-[#8a7e6e] text-center tracking-[0.5px]">
+                    Lot No.
+                  </span>
+                </div>
+
+                {/* Add Button */}
+                <div className="flex flex-col gap-[0.3rem]">
+                  <button
+                    onClick={handleAdd}
+                    disabled={atMax || loading}
+                    className={`px-[1rem] py-[0.65rem] rounded-[8px] text-[0.75rem] tracking-[0.8px] uppercase font-semibold transition-all ${atMax || loading
+                      ? "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
+                      : "bg-[#1a1a2e] text-[#d4af6a] hover:bg-[#2d2d4e] hover:-translate-y-[1px] shadow-[0_4px_14px_rgba(26,26,46,0.15)] cursor-pointer"
+                      }`}
+                  >
+                    Check
+                  </button>
+                  <span className="text-[0.6rem] text-transparent text-center">_</span>
+                </div>
+              </div>
+
+              {/* Preview */}
+              {(area || block || lotNo) && (
+                <p className="mt-[0.4rem] text-[0.72rem] text-[#8a7e6e]">
+                  Preview:{" "}
+                  <span className="font-semibold text-[#1a1a2e]">
+                    {[area || "?", block || "?", lotNo || "?"].join("-")}
+                  </span>
+                </p>
+              )}
+
+              {/* Field error */}
+              {fieldError && (
+                <p className="mt-[0.4rem] text-[0.72rem] text-red-500">
+                  {fieldError}
+                </p>
+              )}
             </div>
-
-            {/* Block */}
-            <div className="flex-1 flex flex-col gap-[0.3rem]">
-              <input
-                type="text"
-                placeholder="Block"
-                value={block}
-                onChange={(e) => setBlock(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full px-[0.75rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] outline-none placeholder:text-[#b0a898] focus:border-[#1a1a2e] transition-colors"
-              />
-              <span className="text-[0.6rem] text-[#8a7e6e] text-center tracking-[0.5px]">
-                Block
-              </span>
-            </div>
-
-            <div className="flex items-center pb-[1.3rem]">
-              <span className="text-[#b0a898] font-bold text-lg leading-none">
-                –
-              </span>
-            </div>
-
-            {/* Lot No */}
-            <div className="flex-1 flex flex-col gap-[0.3rem]">
-              <input
-                type="text"
-                placeholder="Lot No."
-                value={lotNo}
-                onChange={(e) => setLotNo(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full px-[0.75rem] py-[0.65rem] rounded-[8px] border-[1.5px] border-[#ddd8ce] bg-white text-[0.85rem] text-[#1a1a2e] outline-none placeholder:text-[#b0a898] focus:border-[#1a1a2e] transition-colors"
-              />
-              <span className="text-[0.6rem] text-[#8a7e6e] text-center tracking-[0.5px]">
-                Lot No.
-              </span>
-            </div>
-
-            {/* Add Button */}
-            <div className="flex flex-col gap-[0.3rem]">
-              <button
-                onClick={handleAdd}
-                disabled={atMax || loading}
-                className={`px-[1rem] py-[0.65rem] rounded-[8px] text-[0.75rem] tracking-[0.8px] uppercase font-semibold transition-all ${
-                  atMax || loading
-                    ? "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
-                    : "bg-[#1a1a2e] text-[#d4af6a] hover:bg-[#2d2d4e] hover:-translate-y-[1px] shadow-[0_4px_14px_rgba(26,26,46,0.15)] cursor-pointer"
-                }`}
-              >
-                Check
-              </button>
-              <span className="text-[0.6rem] text-transparent text-center">
-                _
-              </span>
-            </div>
-          </div>
-
-          {/* Preview */}
-          {(area || block || lotNo) && (
-            <p className="mt-[0.4rem] text-[0.72rem] text-[#8a7e6e]">
-              Preview:{" "}
-              <span className="font-semibold text-[#1a1a2e]">
-                {[area || "?", block || "?", lotNo || "?"].join("-")}
-              </span>
-            </p>
-          )}
-
-          {/* Field error */}
-          {fieldError && (
-            <p className="mt-[0.4rem] text-[0.72rem] text-red-500">
-              {fieldError}
-            </p>
-          )}
-        </div>
-
+          </>
+        )}
         {/* Selected Lots List */}
         {pending.length > 0 && (
           <div className="mt-[1.2rem]">
@@ -294,13 +295,17 @@ export default function StepSelectLots({
                     </span>
                   </div>
                   <button
-                    onClick={() =>
-                      setPending(
-                        pending.filter(
-                          (p) => p.lot_available !== lot.lot_available,
-                        ),
-                      )
-                    }
+                    onClick={() => {
+                      setPending((prev) =>
+                        prev.filter((p) => p.lot_available !== lot.lot_available),
+                      );
+
+                      sessionStorage.removeItem("confirmedLots");
+                      sessionStorage.removeItem("assignedTerms");
+                      sessionStorage.removeItem("lotInputs");
+                      sessionStorage.removeItem("pricing");
+                      sessionStorage.removeItem("selectedLots");
+                    }}
                     className="text-[#b0a898] hover:text-red-400 text-[0.75rem] transition-colors ml-[0.5rem]"
                   >
                     ✕
@@ -322,11 +327,10 @@ export default function StepSelectLots({
         </button>
 
         <button
-          className={`flex items-center gap-[0.5rem] px-[1.5rem] py-[0.7rem] rounded-[8px] text-xs tracking-[1px] uppercase transition-all ${
-            pending.length > 0 && !loading
-              ? "bg-[#1a1a2e] text-[#d4af6a] shadow-[0_4px_14px_rgba(26,26,46,0.2)] hover:bg-[#2d2d4e] hover:-translate-y-[1px] cursor-pointer"
-              : "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
-          }`}
+          className={`flex items-center gap-[0.5rem] px-[1.5rem] py-[0.7rem] rounded-[8px] text-xs tracking-[1px] uppercase transition-all ${pending.length > 0 && !loading
+            ? "bg-[#1a1a2e] text-[#d4af6a] shadow-[0_4px_14px_rgba(26,26,46,0.2)] hover:bg-[#2d2d4e] hover:-translate-y-[1px] cursor-pointer"
+            : "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
+            }`}
           disabled={pending.length === 0 || loading}
           onClick={() => pending.length > 0 && onNext(pending)}
         >
