@@ -90,9 +90,6 @@ export default function SelectLotDialog({
         className="fixed inset-0 z-[1000] bg-[rgba(10,10,20,0.6)] backdrop-blur-[5px] 
              flex items-center justify-center p-4 font-[Georgia,'Times New Roman',serif] 
              animate-[dlg-in_0.2s_ease]"
-        onMouseDown={(e) => {
-          if (e.target === e.currentTarget) onClose();
-        }}
       >
         <div
           className="bg-[#faf8f4] rounded-[16px] w-full max-w-[860px] max-h-[92vh] 

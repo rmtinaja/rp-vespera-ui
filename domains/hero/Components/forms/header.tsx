@@ -187,7 +187,7 @@ export default function Header() {
         <div className="md:hidden bg-white border-t">
           <ul className="flex flex-col p-4 space-y-3">
             <li>
-              <a href="#">Home</a>
+              <a href="/">Home</a>
             </li>
 
             <li>
@@ -201,13 +201,13 @@ export default function Header() {
               {productsOpen && (
                 <ul className="pl-4 mt-2 space-y-2 text-sm text-gray-600">
                   <li>
-                    <a href="#">Lawn Lots</a>
+                    <a href="/hero/products/lawnlots">Lawn Lots</a>
                   </li>
                   <li>
-                    <a href="#">Estates</a>
+                    <a href="/hero/products/estates">Estates</a>
                   </li>
                   <li>
-                    <a href="#">Community Vault</a>
+                    <a href="/hero/products/community-vault">Community Vault</a>
                   </li>
                   <li>
                     <a href="#">Cremation</a>

@@ -1,4 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { PurchaseAgreementService } from "../../Services/pa.service";
+import Loading from "../dialogs/Loading";
+import { CreditCard, HandCoins } from "lucide-react";
 
 type Lot = { lottype_name: string; lot_available: string };
 type PaymentTerm = {
@@ -17,28 +20,86 @@ function termById(id: string, paymentTerms: PaymentTerm[]) {
   return paymentTerms.find((t) => t.id === id);
 }
 
+// Session storage key for selected terms
+const SESSION_KEY_TERMS = "assignedTerms";
+
 export default function AssignTerms({
   lots,
   initialTerms,
   onBack,
   onConfirm,
   onClose,
-  paymentTerms, // Receive dynamic payment terms from parent
+  paymentTerms,
 }: {
   lots: Lot[];
   initialTerms: Record<string, string>;
   onBack: () => void;
   onConfirm: (terms: Record<string, string>) => void;
   onClose: () => void;
-  paymentTerms: PaymentTerm[]; // Dynamic payment terms from API
+  paymentTerms: PaymentTerm[];
 }) {
-  const [terms, setTerms] = useState<Record<string, string>>(initialTerms);
+  const [checking, setChecking] = useState(false);
+  // Load from sessionStorage if exists, otherwise initialTerms
+  const savedTerms = sessionStorage.getItem(SESSION_KEY_TERMS);
+  const [terms, setTerms] = useState<Record<string, string>>(
+    savedTerms ? JSON.parse(savedTerms) : initialTerms,
+  );
+  const peso = (n: number) =>
+    new Intl.NumberFormat("en-PH", {
+      style: "currency",
+      currency: "PHP",
+    }).format(n);
   const [applyAll, setApplyAll] = useState<string>("");
+  const [pricing, setPricing] = useState<Record<string, any>>({});
+  useEffect(() => {
+    const stored: Record<string, any> = {};
 
-  function setTerm(lotId: string, termId: string) {
-    setTerms((prev) => ({ ...prev, [lotId]: termId }));
+    lots.forEach((lot) => {
+      const saved = sessionStorage.getItem(`pricing`);
+      if (saved) {
+        stored[lot.lot_available] = JSON.parse(saved);
+      }
+    });
+
+    setPricing(stored);
+  }, [lots]);
+  // Persist terms in sessionStorage whenever changed
+  useEffect(() => {
+    sessionStorage.setItem(SESSION_KEY_TERMS, JSON.stringify(terms));
+  }, [terms]);
+
+  async function setTerm(lotKey: string, termId: string) {
+    setTerms((prev) => ({ ...prev, [lotKey]: termId }));
+    setApplyAll("");
+    setChecking(true);
+    const selectedLot = lots.find((l) => l.lot_available === lotKey);
+    if (!selectedLot) return;
+
+    const params = {
+      lot_id: (selectedLot as any).lot_id,
+      amort_term_id: Number(termId),
+      payment_scheme_id: 1,
+    };
+
+    try {
+      const res = await PurchaseAgreementService.checkAmortization(params);
+
+      const data = res.data;
+
+      // ✅ update state
+      setPricing((prev) => ({
+        ...prev,
+        [lotKey]: data,
+      }));
+
+      // ✅ persist
+      sessionStorage.setItem(`pricing`, JSON.stringify(data));
+    } catch (err) {
+      console.error("Failed to fetch amortization:", err);
+    } finally {
+      setChecking(false);
+    }
   }
-
   function handleApplyAll(termId: string) {
     setApplyAll(termId);
     const updated: Record<string, string> = {};
@@ -52,16 +113,9 @@ export default function AssignTerms({
 
   return (
     <>
-      {/* Meta */}
-      <div className="flex items-center justify-between px-[1.75rem] py-[0.5rem] bg-[#faf8f4] border-b border-[#e8e3da] flex-shrink-0">
-        <span className="text-[0.72rem] text-[#8a7e6e] tracking-[0.5px]">
-          Assign a payment term of the selected lot
-          {lots.length !== 1 ? "s" : ""}
-        </span>
-      </div>
-
       {/* Per-lot term cards */}
-      <div className="overflow-y-auto flex-1 px-[1.75rem] py-[1.2rem]">
+      <div className={`relative overflow-y-auto flex-1 px-[1.75rem] py-[1.2rem]${checking ? "pointer-events-none" : ""}`}>
+        {checking && <Loading text="Generating amortization schedule..." />}
         <div className="flex flex-col gap-[0.9rem]">
           {lots.map((lot) => {
             const { block, section, lotNum } = parseLot(lot.lot_available);
@@ -70,11 +124,10 @@ export default function AssignTerms({
             return (
               <div
                 key={lot.lot_available}
-                className={`rounded-[12px] border-[1.5px] overflow-hidden transition-colors ${
-                  selectedTerm
-                    ? "border-[#b5dfc9] bg-white"
-                    : "border-[#e0dbd1] bg-white"
-                }`}
+                className={`rounded-[12px] border-[1.5px] overflow-hidden transition-colors ${selectedTerm
+                  ? "border-[#b5dfc9] bg-white"
+                  : "border-[#e0dbd1] bg-white"
+                  }`}
               >
                 {/* Lot info */}
                 <div className="flex items-center gap-[0.85rem] px-[1rem] py-[0.85rem] border-b border-[#f0ede5]">
@@ -96,10 +149,7 @@ export default function AssignTerms({
                   <select
                     className="w-full text-[0.78rem] border-[1.5px] rounded-[8px] px-[0.65rem] py-[0.55rem] transition-all bg-[#faf8f4] border-[#e0dbd1] focus:border-[#2d7a4f] focus:bg-[#edf7f2]"
                     value={selectedTerm || ""}
-                    onChange={(e) => {
-                      setTerm(lot.lot_available, e.target.value);
-                      setApplyAll("");
-                    }}
+                    onChange={(e) => setTerm(lot.lot_available, e.target.value)}
                   >
                     <option value="" disabled>
                       Select Payment Term
@@ -111,11 +161,80 @@ export default function AssignTerms({
                     ))}
                   </select>
                 </div>
+                {pricing[lot.lot_available] && (() => {
+                  const p = pricing[lot.lot_available];
+                  const isSpot = p.lot.amortType?.toLowerCase().includes("spot");
+
+                  return (
+                    <div className="mt-[0.8rem] rounded-[14px] bg-white border border-[#ebe7df] shadow-[0_6px_18px_rgba(0,0,0,0.06)] overflow-hidden transition-all hover:shadow-[0_10px_24px_rgba(0,0,0,0.08)]">
+
+                      {/* Header */}
+                      <div className="flex items-center justify-between px-[0.9rem] py-[0.55rem] bg-gradient-to-r from-[#f8f6f2] to-[#f1ece4] border-b">
+                        <div className="flex flex-col">
+                          <span className="flex items-center gap-[0.4rem] text-[0.7rem] font-semibold text-[#1a1a2e]">
+                            {isSpot ? (
+                              <>
+                                <CreditCard className="w-3.5 h-3.5 text-[#1a1a2e]" />
+                                Spot Cash
+                              </>
+                            ) : (
+                              <>
+                                <HandCoins className="w-3.5 h-3.5 text-[#1a1a2e]" />
+                                Installment Plan
+                              </>
+                            )}
+                          </span>
+                          <span className="text-[0.6rem] text-[#8a7e6e]">
+                            {p.lot.amortType}
+                          </span>
+                        </div>
+
+                        <div className={`text-[0.6rem] px-[0.45rem] py-[0.15rem] rounded-full font-medium ${isSpot
+                          ? "bg-green-100 text-green-700"
+                          : "bg-blue-100 text-blue-700"
+                          }`}>
+                          {isSpot ? "One-time" : "Monthly"}
+                        </div>
+                      </div>
+
+                      {/* Body */}
+                      <div className="p-[0.9rem] flex flex-col gap-[0.6rem]">
+
+                        {isSpot ? (
+                          <>
+                            <div className="flex justify-between items-end">
+                              <span className="text-[0.7rem] text-[#7a6f5c]">Total Payment</span>
+                              <span className="text-[0.95rem] font-bold text-[#1a1a2e]">
+                                {peso(p.spotcash.amtSpotcash)}
+                              </span>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            <div className="flex justify-between items-end">
+                              <span className="text-[0.7rem] text-[#7a6f5c]">Monthly Payment</span>
+                              <span className="text-[0.95rem] font-bold text-[#1a1a2e]">
+                                {peso(p.amort.amtAmortPrice)}
+                              </span>
+                            </div>
+
+                            <div className="flex justify-between text-[0.65rem] text-[#8f8575]">
+                              <span>Duration</span>
+                              <span>{p.contract.numMonths} months</span>
+                            </div>
+                          </>
+                        )}
+
+                      </div>
+                    </div>
+                  );
+                })()}
               </div>
             );
           })}
         </div>
       </div>
+
       {/* Footer */}
       <div className="flex items-center justify-between gap-[1rem] px-[1.75rem] py-[0.9rem] border-t border-[#e8e3da] bg-[#f5f1eb] flex-shrink-0">
         <button
@@ -140,11 +259,10 @@ export default function AssignTerms({
           Back
         </button>
         <button
-          className={`flex items-center gap-[0.5rem] px-[1.5rem] py-[0.7rem] rounded-[8px] text-[0.78rem] font-[\"Courier New\",monospace] uppercase tracking-[1px] transition-all ${
-            allAssigned
-              ? "bg-[#1a1a2e] text-[#d4af6a] shadow-[0_4px_14px_rgba(26,26,46,0.2)] hover:bg-[#2d2d4e] hover:-translate-y-[1px]"
-              : "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
-          }`}
+          className={`flex items-center gap-[0.5rem] px-[1.5rem] py-[0.7rem] rounded-[8px] text-[0.78rem] font-[\"Courier New\",monospace] uppercase tracking-[1px] transition-all ${allAssigned
+            ? "bg-[#1a1a2e] text-[#d4af6a] shadow-[0_4px_14px_rgba(26,26,46,0.2)] hover:bg-[#2d2d4e] hover:-translate-y-[1px]"
+            : "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
+            }`}
           disabled={!allAssigned}
           onClick={() => allAssigned && onConfirm(terms)}
         >
