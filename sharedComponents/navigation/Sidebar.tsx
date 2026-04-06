@@ -19,7 +19,7 @@ export default function Sidebar() {
   const menu = menuConfig[currentPage] || menuConfig.default
 
   return (
-    <div className="sidebar p-4 w-64 bg-accent-rp text-white rounded-md">
+    <div className="sidebar p-4 w-64 bg-accent-rp text-white rounded-2xl">
       
       <div className="mb-6 flex justify-center">
         <img src="/logo.png" alt="logo" className="w-32 object-contain" />

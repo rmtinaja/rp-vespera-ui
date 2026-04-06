@@ -48,6 +48,23 @@ export const PaymentService = {
 
         return response.json();
     },
+    async verifyGenericName(
+        payload: VerifyNameDTO
+    ): Promise<VerifyNameResponseDTO> {
+        const response = await fetch(`${BASE_URL}/verifyGenericName`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(payload),
+        });
+
+        if (!response.ok) {
+            throw new Error("Verification failed");
+        }
+
+        return response.json();
+    },
     async sendOtp(
         payload: SendOtpDTO
     ): Promise<SendOtpResponseDTO> {

@@ -57,7 +57,6 @@ export default function TransactionList({
           <thead className="bg-accent-rp text-left">
             <tr>
               <th>ID</th>
-              <th>Doc ID</th>
               <th>Name</th>
               <th>Reference Number</th>
               <th>Lot</th>
@@ -90,7 +89,6 @@ export default function TransactionList({
               transactions.map((t) => (
                 <tr key={t.id}>
                   <td>{t.id}</td>
-                  <td>{t.doc_id}</td>
                   <td>{t.name}</td>
                   <td>{t.reference_number}</td>
                   <td>{t.lot_number}</td>
