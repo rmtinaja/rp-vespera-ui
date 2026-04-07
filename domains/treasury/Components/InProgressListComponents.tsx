@@ -49,9 +49,7 @@ export default function TransactionList({
   };
 
   return (
-    <div className="p-4">
-      <h2 className="text-lg font-semibold mb-4">{title}</h2>
-
+    <div>
       <div className="overflow-auto">
         <table className="w-full projecttable">
           <thead className="bg-accent-rp text-left">

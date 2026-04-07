@@ -16,7 +16,6 @@ export default function Form() {
   const [currentForm, setCurrentForm] = useState<number>(0);
   const [paymentForm, setPaymentForm] = useState<string>("");
 
-  // ✅ Restore session on reload
   useEffect(() => {
     const storedForm = sessionStorage.getItem("CurrentForm");
     const storedPayment = sessionStorage.getItem("PaymentOption");
@@ -32,7 +31,6 @@ export default function Form() {
     }
   }, []);
 
-  // ✅ Centralized navigation
   const changeForm = (step: number, payment?: string) => {
     if (payment) {
       setPaymentForm(payment);
@@ -46,28 +44,28 @@ export default function Form() {
   return (
     <div className="w-full flex flex-row justify-center">
       <div className="lg:w-4/5 w-[90%] lg:p-10 p-5 bg-secondary-rp rounded-2xl">
-
-        {/* STEP 0 */}
         {currentForm === 0 && (
-          <CustomerInformation nextPage={() => changeForm(1)} />
+          <CustomerInformation
+            nextPage={(paymentType) => {
+              if (paymentType === "Others") {
+                changeForm(3, "Others");
+              } else {
+                changeForm(1);
+              }
+            }}
+          />
         )}
-
-        {/* STEP 1 */}
         {currentForm === 1 && (
           <OTPConfirmation
             nextPage={() => changeForm(2)}
             prevPage={() => changeForm(0)}
           />
         )}
-
-        {/* STEP 2 */}
         {currentForm === 2 && (
           <PaymentSelection
             nextPage={(paymentType) => changeForm(3, paymentType)}
           />
         )}
-
-        {/* STEP 3 - Dynamic Payment Forms */}
         {currentForm === 3 && paymentForm === "LSP" && (
           <LSPayment nextPage={() => changeForm(4)} />
         )}
@@ -79,7 +77,7 @@ export default function Form() {
         {currentForm === 3 && paymentForm === "Others" && (
           <OthersPayment nextPage={() => changeForm(4)} />
         )}
-        {/* STEP 4 */}
+
         {currentForm === 4 && <ConfirmationPage />}
 
       </div>

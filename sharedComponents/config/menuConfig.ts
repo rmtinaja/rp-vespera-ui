@@ -6,7 +6,8 @@ import {
   XCircle,
   Users,
   Settings,
-  LucideIcon
+  LucideIcon,
+  CircleQuestionMark
 } from "lucide-react"
 
 export type MenuItem = {
@@ -25,6 +26,7 @@ export const menuConfig: MenuConfig = {
     { name: "In Progress", href: "/page/treasury/confirmation", icon: Clock },
     { name: "Transaction", href: "/page/treasury/transaction", icon: Receipt },
     { name: "Complete", href: "/page/treasury/complete", icon: CheckCircle },
+    { name: "Unknown", href: "/page/treasury/unknownpayment", icon: CircleQuestionMark },
     { name: "Cancelled", href: "/page/treasury/cancelled", icon: XCircle },
   ],
   admin: [
