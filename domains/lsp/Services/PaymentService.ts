@@ -11,6 +11,7 @@ function buildPaymentFormData(dto: SubmitPaymentDTO): FormData {
     formData.append("mp_t_purchagr_id", dto.mp_t_purchagr_id.toString());
     formData.append("reference_number", dto.reference_number);
     formData.append("cnc_sales_incharge", dto.cnc_sales_incharge);
+    formData.append("accountNumber", dto.accountNumber);
     if (dto.attachment) {
         formData.append("attachment", dto.attachment);
     }
@@ -25,6 +26,9 @@ function buildPaymentFormData(dto: SubmitPaymentDTO): FormData {
     }
     if (dto.date_deposited !== undefined) {
         formData.append("date_deposited", dto.date_deposited);
+    }
+    if (dto.accountNumber !== undefined) {
+        formData.append("accountNumber", dto.accountNumber);
     }
     formData.append("lots", JSON.stringify(dto.lots));
     return formData;
