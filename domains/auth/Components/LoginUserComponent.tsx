@@ -5,6 +5,11 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { LockIcon, User2Icon } from "lucide-react";
 import { AuthService } from "@/domains/auth/Services/auth.service";
+import {
+  toastError,
+  toastSuccess,
+} from "@/sharedComponents/services/ToastContext";
+import Loading from "@/domains/pa/Components/dialogs/Loading";
 
 export default function LoginUserComponent() {
   const router = useRouter();
@@ -42,12 +47,12 @@ export default function LoginUserComponent() {
         router.push("/");
         router.refresh(); // 🔥 ensures header detects login
 
-        // alert("Login successful!");
+        toastSuccess("Login successfully");
       } else {
         alert(res.message);
       }
     } catch (error: any) {
-      alert(error.response?.data?.message || "Login failed");
+      toastError(error.response?.data?.message || "Login failed");
     } finally {
       setLoading(false);
     }
@@ -55,6 +60,7 @@ export default function LoginUserComponent() {
 
   return (
     <div className="h-screen overflow-hidden bg-[#f7f7f7] flex items-center justify-center">
+      {loading && <Loading text="Saving purchase agreement.Please Wait!..." />}
       <div className="w-full max-w-[1200px] h-[90vh] flex rounded-[4px] overflow-hidden">
         <div className="w-full lg:w-[420px] bg-white border border-[#eaeae8] flex flex-col justify-center px-10">
           <div className="mb-10">

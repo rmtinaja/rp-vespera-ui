@@ -1,11 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import SelectLotDialog from "../Components/dialogs/SelectLotDialog";
 import Beneficiaries from "./forms/Beneficiaries";
 import PaymentSchedule from "./forms/PaymentSchedule";
 import ReviewAndSign from "./forms/ReviewAndSign";
 import { PurchaseAgreementService } from "../Services/pa.service";
+import { Toast } from "primereact/toast";
+import { Button } from "primereact/button";
 
 type LotWithTerm = {
   lottype_name: string;
@@ -42,7 +44,8 @@ export default function PurchaseAgreement() {
   const [confirmedLots, setConfirmedLots] = useState<LotWithTerm[]>([]);
   const [beneficiaries, setBeneficiaries] = useState<Beneficiary[]>([]);
   const [paymentTerms, setPaymentTerms] = useState<PaymentTerm[]>([]);
-  const [paymentSchedule, setPaymentSchedule] = useState<PaymentScheduleType | null>(null);
+  const [paymentSchedule, setPaymentSchedule] =
+    useState<PaymentScheduleType | null>(null);
   const [submitted, setSubmitted] = useState(false);
 
   const [loading, setLoading] = useState(true);
@@ -53,7 +56,9 @@ export default function PurchaseAgreement() {
     const savedLots = sessionStorage.getItem(SESSION_KEY_LOTS);
     if (savedLots) setConfirmedLots(JSON.parse(savedLots));
 
-    const savedBeneficiaries = sessionStorage.getItem(SESSION_KEY_BENEFICIARIES);
+    const savedBeneficiaries = sessionStorage.getItem(
+      SESSION_KEY_BENEFICIARIES,
+    );
     if (savedBeneficiaries) setBeneficiaries(JSON.parse(savedBeneficiaries));
 
     const savedPayment = sessionStorage.getItem(SESSION_KEY_PAYMENT);
@@ -65,12 +70,18 @@ export default function PurchaseAgreement() {
   }, [confirmedLots]);
 
   useEffect(() => {
-    sessionStorage.setItem(SESSION_KEY_BENEFICIARIES, JSON.stringify(beneficiaries));
+    sessionStorage.setItem(
+      SESSION_KEY_BENEFICIARIES,
+      JSON.stringify(beneficiaries),
+    );
   }, [beneficiaries]);
 
   useEffect(() => {
     if (paymentSchedule) {
-      sessionStorage.setItem(SESSION_KEY_PAYMENT, JSON.stringify(paymentSchedule));
+      sessionStorage.setItem(
+        SESSION_KEY_PAYMENT,
+        JSON.stringify(paymentSchedule),
+      );
     }
   }, [paymentSchedule]);
 
@@ -147,7 +158,8 @@ export default function PurchaseAgreement() {
       num: 3,
       label: "Payment Schedule",
       done: paymentSchedule !== null,
-      canClick: confirmedLots.length > 0 && beneficiaries.length > 0 && !submitted,
+      canClick:
+        confirmedLots.length > 0 && beneficiaries.length > 0 && !submitted,
       summary: paymentSchedule
         ? `Payment on ${ordinal(paymentSchedule.paymentDay)} of each month`
         : "Not yet configured",
@@ -166,150 +178,159 @@ export default function PurchaseAgreement() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center p-8 font-sans">
-      <div className="bg-white rounded-xl border border-[#d6d3d1] p-10 max-w-[720px] w-full shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
-        <h1 className="font-serif text-[2rem] font-medium text-[#060503] mb-2">
-          Purchase Agreement
-        </h1>
-        <p className="text-[0.875rem] text-[#6b6b6b] italic mb-6">
-          Select your lot and enter beneficiary information before finalizing.
-        </p>
-
-        {/* Submitted banner */}
-        {submitted && (
-          <div className="mb-6 flex items-center gap-3 px-4 py-3 bg-[#f0faf4] border border-[#a8d5b5] rounded-[10px]">
-            <div className="w-6 h-6 rounded-full bg-[#2e7d52] flex items-center justify-center flex-shrink-0">
-              <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
-                <path d="M3 8l3.5 3.5L13 5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </div>
-            <span className="text-[0.85rem] text-[#2e7d52] font-medium">
-              Agreement submitted successfully.
-            </span>
-          </div>
-        )}
-
-        {/* Step Buttons */}
-        <div className="flex flex-col gap-3">
-          {steps.map((s) => (
-            <button
-              key={s.num}
-              type="button"
-              disabled={!s.canClick || loading}
-              onClick={() => s.canClick && !loading && openDialog(s.num)}
-              className={`w-full flex items-center gap-3 p-3 rounded-lg border-[1.5px] text-left transition-all
-                ${s.done
-                  ? "border-[#b28648] bg-[#fef8f2] hover:bg-[#fdf3e7]"
-                  : currentStep === s.num
-                    ? "border-[#060503] bg-[#f5f1eb] hover:bg-[#ede9e2]"
-                    : s.canClick
-                      ? "border-[#d6d3d1] bg-white hover:bg-[#f5f5f3] hover:border-[#060503]"
-                      : "border-[#d6d3d1] bg-[#f9f9f9] opacity-50 cursor-not-allowed"
-                }`}
-            >
-              <div
-                className={`w-9 h-9 flex-shrink-0 flex items-center justify-center font-mono text-sm font-semibold rounded-full border-[1.5px] transition-colors
-                  ${currentStep === s.num && s.canClick
-                    ? "bg-[#060503] border-[#060503] text-[#b28648]"
-                    : s.done
-                      ? "bg-[#b28648] border-[#b28648] text-white"
-                      : "bg-[#f7f7f7] border-[#d6d3d1] text-[#6b6b6b]"
-                  }`}
-              >
-                {s.done ? "✔" : `0${s.num}`}
-              </div>
-              <div className="flex-1 min-w-0">
-                <span
-                  className={`block text-[0.875rem] font-sans font-semibold
-                    ${currentStep === s.num
-                      ? "text-[#060503]"
-                      : s.done
-                        ? "text-[#b28648]"
-                        : "text-[#6b6b6b]"
-                    }`}
-                >
-                  {s.label}
-                </span>
-                <span className="block text-[0.75rem] text-[#9a9a9a] mt-[1px]">
-                  {s.summary}
-                </span>
-              </div>
-              {s.canClick && (
-                <svg
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  width="16"
-                  height="16"
-                  className={`flex-shrink-0 transition-colors ${s.done ? "text-[#b28648]" : "text-[#9a9a9a]"}`}
-                >
+    <>
+      <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center p-8 font-sans">
+        <div className="bg-white rounded-xl border border-[#d6d3d1] p-10 max-w-[720px] w-full shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+          <h1 className="font-serif text-[2rem] font-medium text-[#060503] mb-2">
+            Purchase Agreement
+          </h1>
+          <p className="text-[0.875rem] text-[#6b6b6b] italic mb-6">
+            Select your lot and enter beneficiary information before finalizing.
+          </p>
+          {submitted && (
+            <div className="mb-6 flex items-center gap-3 px-4 py-3 bg-[#f0faf4] border border-[#a8d5b5] rounded-[10px]">
+              <div className="w-6 h-6 rounded-full bg-[#2e7d52] flex items-center justify-center flex-shrink-0">
+                <svg viewBox="0 0 16 16" fill="none" width="12" height="12">
                   <path
-                    d="M7 5l5 5-5 5"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
+                    d="M3 8l3.5 3.5L13 5"
+                    stroke="white"
+                    strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                 </svg>
-              )}
-            </button>
-          ))}
+              </div>
+              <span className="text-[0.85rem] text-[#2e7d52] font-medium">
+                Agreement submitted successfully.
+              </span>
+            </div>
+          )}
+
+          {/* Step Buttons */}
+          <div className="flex flex-col gap-3">
+            {steps.map((s) => (
+              <button
+                key={s.num}
+                type="button"
+                disabled={!s.canClick || loading}
+                onClick={() => s.canClick && !loading && openDialog(s.num)}
+                className={`w-full flex items-center gap-3 p-3 rounded-lg border-[1.5px] text-left transition-all
+                ${
+                  s.done
+                    ? "border-[#b28648] bg-[#fef8f2] hover:bg-[#fdf3e7]"
+                    : currentStep === s.num
+                      ? "border-[#060503] bg-[#f5f1eb] hover:bg-[#ede9e2]"
+                      : s.canClick
+                        ? "border-[#d6d3d1] bg-white hover:bg-[#f5f5f3] hover:border-[#060503]"
+                        : "border-[#d6d3d1] bg-[#f9f9f9] opacity-50 cursor-not-allowed"
+                }`}
+              >
+                <div
+                  className={`w-9 h-9 flex-shrink-0 flex items-center justify-center font-mono text-sm font-semibold rounded-full border-[1.5px] transition-colors
+                  ${
+                    currentStep === s.num && s.canClick
+                      ? "bg-[#060503] border-[#060503] text-[#b28648]"
+                      : s.done
+                        ? "bg-[#b28648] border-[#b28648] text-white"
+                        : "bg-[#f7f7f7] border-[#d6d3d1] text-[#6b6b6b]"
+                  }`}
+                >
+                  {s.done ? "✔" : `0${s.num}`}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <span
+                    className={`block text-[0.875rem] font-sans font-semibold
+                    ${
+                      currentStep === s.num
+                        ? "text-[#060503]"
+                        : s.done
+                          ? "text-[#b28648]"
+                          : "text-[#6b6b6b]"
+                    }`}
+                  >
+                    {s.label}
+                  </span>
+                  <span className="block text-[0.75rem] text-[#9a9a9a] mt-[1px]">
+                    {s.summary}
+                  </span>
+                </div>
+                {s.canClick && (
+                  <svg
+                    viewBox="0 0 20 20"
+                    fill="none"
+                    width="16"
+                    height="16"
+                    className={`flex-shrink-0 transition-colors ${s.done ? "text-[#b28648]" : "text-[#9a9a9a]"}`}
+                  >
+                    <path
+                      d="M7 5l5 5-5 5"
+                      stroke="currentColor"
+                      strokeWidth="1.8"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                )}
+              </button>
+            ))}
+          </div>
         </div>
+
+        {/* Dialog — Step 1: Select Lots */}
+        {dialogOpen && activeDialog === 1 && !loading && (
+          <SelectLotDialog
+            initial={confirmedLots}
+            paymentTerms={paymentTerms}
+            onConfirm={(lots) => {
+              setConfirmedLots(lots);
+              closeDialog();
+            }}
+            onClose={closeDialog}
+          />
+        )}
+
+        {/* Dialog — Step 2: Beneficiaries */}
+        {dialogOpen && activeDialog === 2 && (
+          <Beneficiaries
+            initialBeneficiaries={beneficiaries}
+            setDialogOpen={setDialogOpen}
+            setActiveDialog={setActiveDialog}
+            onSave={(updated) => {
+              setBeneficiaries(updated);
+              closeDialog();
+            }}
+          />
+        )}
+
+        {/* Dialog — Step 3: Payment Schedule */}
+        {dialogOpen && activeDialog === 3 && (
+          <PaymentSchedule
+            initialSchedule={paymentSchedule}
+            paymentTerms={paymentTerms}
+            confirmedLots={confirmedLots}
+            onSave={(schedule) => {
+              setPaymentSchedule(schedule);
+              closeDialog();
+            }}
+            onClose={closeDialog}
+          />
+        )}
+
+        {/* Dialog — Step 4: Review & Sign */}
+        {dialogOpen && activeDialog === 4 && (
+          <ReviewAndSign
+            confirmedLots={confirmedLots}
+            beneficiaries={beneficiaries}
+            paymentSchedule={paymentSchedule}
+            paymentTerms={paymentTerms}
+            onConfirm={() => {
+              setSubmitted(true);
+              closeDialog();
+            }}
+            onClose={closeDialog}
+          />
+        )}
       </div>
-
-      {/* Dialog — Step 1: Select Lots */}
-      {dialogOpen && activeDialog === 1 && !loading && (
-        <SelectLotDialog
-          initial={confirmedLots}
-          paymentTerms={paymentTerms}
-          onConfirm={(lots) => {
-            setConfirmedLots(lots);
-            closeDialog();
-          }}
-          onClose={closeDialog}
-        />
-      )}
-
-      {/* Dialog — Step 2: Beneficiaries */}
-      {dialogOpen && activeDialog === 2 && (
-        <Beneficiaries
-          initialBeneficiaries={beneficiaries}
-          setDialogOpen={setDialogOpen}
-          setActiveDialog={setActiveDialog}
-          onSave={(updated) => {
-            setBeneficiaries(updated);
-            closeDialog();
-          }}
-        />
-      )}
-
-      {/* Dialog — Step 3: Payment Schedule */}
-      {dialogOpen && activeDialog === 3 && (
-        <PaymentSchedule
-          initialSchedule={paymentSchedule}
-          paymentTerms={paymentTerms}
-          confirmedLots={confirmedLots}
-          onSave={(schedule) => {
-            setPaymentSchedule(schedule);
-            closeDialog();
-          }}
-          onClose={closeDialog}
-        />
-      )}
-
-      {/* Dialog — Step 4: Review & Sign */}
-      {dialogOpen && activeDialog === 4 && (
-        <ReviewAndSign
-          confirmedLots={confirmedLots}
-          beneficiaries={beneficiaries}
-          paymentSchedule={paymentSchedule}
-          paymentTerms={paymentTerms}
-          onConfirm={() => {
-            setSubmitted(true);
-            closeDialog();
-          }}
-          onClose={closeDialog}
-        />
-      )}
-    </div>
+    </>
   );
 }

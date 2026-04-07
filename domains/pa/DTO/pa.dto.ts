@@ -104,3 +104,27 @@ export interface CheckAmortizationParams {
   amort_term_id?: number;
   payment_scheme_id: number;
 }
+
+export interface SavePurchaseAgreementParams {
+  adorg: string;
+  mp_i_owner: number;
+  first_beneficiary?: string | null;
+  second_beneficiary?: string | null;
+  mp_i_lot: number;
+
+  amort_term: number;
+
+  amt_sales: number;
+  amt_spotcash?: number | null;
+  amt_spotcash_vat: number;
+  amt_spotcash_pcf?: number | null;
+
+  amt_amort?: number | null;
+  amt_amort_sales?: number | null;
+  amt_amort_vat?: number | null;
+  amt_amort_pcf?: number | null;
+
+  amt_contract: number;
+  cnt_months_to_pay: number;
+  date_sched_payment: string;
+}

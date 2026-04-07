@@ -1,7 +1,6 @@
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-
 export default function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [productsOpen, setProductsOpen] = useState(false);
@@ -16,6 +15,8 @@ export default function Header() {
 
     setIsLoggedIn(!!token);
   }, []);
+
+  
   return (
     <>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">

@@ -1,5 +1,7 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Raleway:ital,wght@0,100..900;1,100..900&display=swap");
+@import "primereact/resources/themes/lara-light-blue/theme.css";
+@import "primereact/resources/primereact.min.css";
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -33,9 +35,9 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-.login{
+.login {
   @apply w-full h-dvh;
-  background-image: url('/bg.png');
+  background-image: url("/bg.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -43,65 +45,65 @@ body {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  .logincontainer{
+  .logincontainer {
     @apply w-1/3 bg-white rounded-xl p-5 border-x-4 border-[#00303a];
     box-shadow: 0px 0px 11px 2px rgba(0, 0, 0, 0.397);
   }
 }
 
 //fonts
-.font-playfair{
-    font-family: "Playfair Display", serif;
-    font-style: normal;
+.font-playfair {
+  font-family: "Playfair Display", serif;
+  font-style: normal;
 }
-.font-raleway{
-    font-family: "Raleway", sans-serif;
-    font-style: normal;
+.font-raleway {
+  font-family: "Raleway", sans-serif;
+  font-style: normal;
 }
-.font-nunito{
-    font-family: "Nunito", sans-serif;
-    font-style: normal;
+.font-nunito {
+  font-family: "Nunito", sans-serif;
+  font-style: normal;
 }
 
 //button
-button{
+button {
   padding: 7px 20px;
   border-radius: 10px;
   cursor: pointer;
 }
-.btn-ico{
-  @apply  flex flex-row items-center justify-between gap-2;
+.btn-ico {
+  @apply flex flex-row items-center justify-between gap-2;
 }
-.btn-primary{
-    background-color: #0d6efd;
-    color: #ffffff !important;
+.btn-primary {
+  background-color: #0d6efd;
+  color: #ffffff !important;
 }
-.btn-secondary{
-    background-color: #6c757d;
-    color: #fff !important;
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff !important;
 }
-.btn-danger{
-    background-color: #dc3545;
-    color:#fff !important;
+.btn-danger {
+  background-color: #dc3545;
+  color: #fff !important;
 }
-.btn-success{
-    background-color: #198754;
-    color: #fff !important;
+.btn-success {
+  background-color: #198754;
+  color: #fff !important;
 }
-.btn-warning{
-    background-color: #ffc107;
-    color: #fff;
+.btn-warning {
+  background-color: #ffc107;
+  color: #fff;
 }
-.btn-info{
-    background-color: #0dcaf0;
-    color: #0a0a0a;
+.btn-info {
+  background-color: #0dcaf0;
+  color: #0a0a0a;
 }
 .btn-accent2-rp{
     background-color: #004755;
     color: #ffffff;
 }
 
-.p-toast-message-content{
+.p-toast-message-content {
   background-color: #0dcaf0de;
   padding: 10px;
   margin: 10px;
@@ -109,97 +111,96 @@ button{
   align-items: center !important;
   border-left: 3px solid #00303a;
   gap: 15px;
-  button{
+  button {
     padding: 5px !important;
     border-radius: 50px;
-    .p-toast-message-text{
+    .p-toast-message-text {
       color: #fff !important;
     }
   }
 }
-.p-toast-icon-close{
-  p-link{
+.p-toast-icon-close {
+  p-link {
     padding: unset !important;
   }
-  
 }
 
-.page-content{
-    width: 100%;
-    height: 100%;
-    overflow: auto;
+.page-content {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
 }
- 
+
 //RP branding
-.bg-accent-rp{ 
-  background-color: #0A352D;
-  color:#fff;
+.bg-accent-rp {
+  background-color: #0a352d;
+  color: #fff;
 }
-.bg-secondary-rp{
-  background-color: #B18343;
+.bg-secondary-rp {
+  background-color: #b18343;
 }
-.bg-primary-rp{
-  background-color: #EAE1D4;
+.bg-primary-rp {
+  background-color: #eae1d4;
 }
 
 //Vespera branding
-.bg-accent-vespera{
+.bg-accent-vespera {
   background-color: #204499;
 }
-.bg-secondary-vespera{
-  background-color: #9DAED0;
+.bg-secondary-vespera {
+  background-color: #9daed0;
 }
-.bg-primary-vespera{
-  background-color: #FBFBFB;
+.bg-primary-vespera {
+  background-color: #fbfbfb;
 }
 //page container
-.page{
+.page {
   width: 100%;
   height: 100dvh;
 }
 
-.flex-row-center{
+.flex-row-center {
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
 }
-.flex-col-center{
+.flex-col-center {
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.flex-start{
+.flex-start {
   display: flex;
   justify-content: start;
   align-items: start;
 }
-.flex-space-between{
+.flex-space-between {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
-.flex-right{
+.flex-right {
   align-items: flex-end !important;
 }
-.flex-left{
+.flex-left {
   align-items: flex-start !important;
 }
 
 //Forms
-.input-text-container{
-    @apply flex flex-row p-2 rounded-md gap-2 border items-center;
+.input-text-container {
+  @apply flex flex-row p-2 rounded-md gap-2 border items-center;
 }
-.input-field{
-    @apply w-full outline-none
+.input-field {
+  @apply w-full outline-none;
 }
-.field-container{
-    color:#0a0a0a;
-    display: flex;
-    flex-direction: column;
-    gap:3px;
-    margin-bottom: 7px;
+.field-container {
+  color: #0a0a0a;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  margin-bottom: 7px;
 }
 .text-field{
     width: 100%;
@@ -209,31 +210,136 @@ button{
     outline: unset !important;
 }
 
-.receiptTable{
-  tr{
+.receiptTable {
+  tr {
     height: 40px;
   }
 }
 
-.projecttable{
+.projecttable {
   width: 100%;
-  td{
+  td {
     padding: 5px;
   }
-  th{
+  th {
     padding: 10px;
   }
-  thead th:first-child{
+  thead th:first-child {
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
   }
 
-  thead th:last-child{
+  thead th:last-child {
     border-top-right-radius: 10px;
     border-bottom-right-radius: 10px;
   }
 
-  .header{
+  .header {
     font-weight: 600;
   }
+}
+
+/* === Toast wrapper === */
+.ct-toast {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border-left: 4px solid transparent;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+  min-width: 300px;
+  max-width: 500px;
+  animation: ct-pop 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* === Severity left-border colors === */
+.ct-success { border-left-color: #639922; }
+.ct-error   { border-left-color: #e24b4a; }
+.ct-warn    { border-left-color: #ba7517; }
+.ct-info    { border-left-color: #378add; }
+
+/* === Icon badge === */
+.ct-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+  font-weight: 700;
+  margin-top: 0; /* fix vertical alignment */
+}
+
+.ct-icon-success { background: #eaf3de; color: #3b6d11; }
+.ct-icon-error   { background: #fcebeb; color: #a32d2d; }
+.ct-icon-warn    { background: #faeeda; color: #854f0b; }
+.ct-icon-info    { background: #e6f1fb; color: #185fa5; }
+
+/* === Text body === */
+.ct-body {
+  flex: 1;
+  min-width: 0;
+  word-wrap: break-word;
+}
+.ct-summary { font-size: 14px; font-weight: 500; color: #111827; margin: 0 0 2px; line-height: 1.3; }
+.ct-detail  { font-size: 13px; color: #6b7280; margin: 0; line-height: 1.5; }
+
+/* === Progress bar === */
+.ct-progress {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  border-radius: 0 0 12px 12px;
+  overflow: hidden;
+}
+
+.ct-bar {
+  height: 100%;
+  width: 100%;
+  animation: ct-drain linear forwards;
+}
+
+.ct-bar-success { background: #97c459; }
+.ct-bar-error   { background: #f09595; }
+.ct-bar-warn    { background: #ef9f27; }
+.ct-bar-info    { background: #85b7eb; }
+
+/* === Animations === */
+@keyframes ct-pop {
+  from { opacity: 0; transform: translateX(20px) scale(0.97); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+
+@keyframes ct-drain {
+  from { width: 100%; }
+  to   { width: 0%; }
+}
+
+/* === Override PrimeReact Toast container position === */
+.p-toast {
+  top: 20px !important;
+  right: 20px !important;
+}
+
+.p-toast-message {
+  padding: 0 !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.p-toast-message-content {
+  padding: 0 !important;
+}
+
+.p-toast-icon-close {
+  display: none !important;
 }

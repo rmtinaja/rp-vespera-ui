@@ -13,8 +13,8 @@ interface Step7Props {
 export default function Step7({ backStep }: Step7Props) {
   const [ip, setIp] = useState("");
   const [sessionData, setSessionData] = useState<any>({});
-  const [loading, setLoading] = useState(false);     
-  const [loggingIn, setLoggingIn] = useState(false); 
+  const [loading, setLoading] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
 
   const apiService = new ApiService();
   const router = useRouter();
@@ -62,8 +62,8 @@ export default function Step7({ backStep }: Step7Props) {
         type_of_payor: sessionData.typeOfPayor,
         email: sessionData.email,
         password: sessionData.password,
-        ip_address: ip, 
-        id_name: sessionData.type_of_id, 
+        ip_address: ip,
+        id_name: sessionData.type_of_id,
       };
 
       await apiService.registerUser(dto);
@@ -74,13 +74,12 @@ export default function Step7({ backStep }: Step7Props) {
       const loginRes = await AuthService.userlogin({
         email: sessionData.email,
         password: sessionData.password,
-        ip: sessionData.ip_address
+        ip: ip,
       });
 
+      localStorage.clear();
       if (loginRes.success) {
         document.cookie = `token=${loginRes.token}; path=/`;
-
-        localStorage.clear();
         setSessionData({});
 
         router.push("/");
@@ -171,11 +170,7 @@ export default function Step7({ backStep }: Step7Props) {
           onClick={onSubmit}
           className="w-1/2 py-2 bg-green-600 text-white rounded-lg"
         >
-          {loading
-            ? "Submitting..."
-            : loggingIn
-            ? "Logging in..."
-            : "Submit"}
+          {loading ? "Submitting..." : loggingIn ? "Logging in..." : "Submit"}
         </Button>
       </div>
     </div>
