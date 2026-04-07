@@ -33,6 +33,7 @@ export default function LSPayment({ nextPage }: Props) {
 
   const [receiptFile, setReceiptFile] = useState<File | null>(null);
   const [referenceNumber, setReferenceNumber] = useState("");
+  const [accountNumber, setaccountNumber] = useState("");
   const [date_deposited, setdate_deposited] = useState("");
   const [aiReading, setAiReading] = useState(false);
 
@@ -85,6 +86,7 @@ export default function LSPayment({ nextPage }: Props) {
 
       if (result.success) {
         setReferenceNumber(result.referenceNumber || "");
+        setaccountNumber(result.accountNumber || "");
         setdate_deposited(result.date_deposited || "");
         setPaymentAmount(Number(result.amount) || 0);
       } else {
@@ -251,6 +253,7 @@ export default function LSPayment({ nextPage }: Props) {
         mp_i_owner_id: ownerId,
         mp_t_purchagr_id: purchaserId,
         reference_number: referenceNumber,
+        accountNumber: accountNumber,
         cnc_sales_incharge: "WEB",
         attachment: receiptFile,
         lots: formattedLots,
@@ -337,7 +340,7 @@ export default function LSPayment({ nextPage }: Props) {
         />
         {aiReading && (
           <div className="text-blue-500">
-            Reading receipt using AI...
+            Reading Reading Receipt Please Wait
           </div>
         )}
       </div>

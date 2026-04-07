@@ -9,6 +9,7 @@ export interface SubmitPaymentDTO {
     mp_i_owner_id: number;
     mp_t_purchagr_id: number;
     reference_number: string;
+    accountNumber: string;
     cnc_sales_incharge: string;
     attachment?: File | null;                                                                                                   
     lots: SubmitPaymentLotDTO[];
