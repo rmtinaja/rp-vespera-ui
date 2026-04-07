@@ -5,7 +5,7 @@ import { User } from "lucide-react";
 import { PaymentService } from "@/domains/lsp/Services/PaymentService";
 
 interface Props {
-  nextPage: () => void;
+  nextPage: (paymentType?: string) => void;
 }
 
 export default function CustomerInformation({ nextPage }: Props) {
@@ -87,13 +87,18 @@ export default function CustomerInformation({ nextPage }: Props) {
         </div>
       </form>
 
-      <button
-        onClick={handleSubmit}
-        disabled={loading}
-        className="!p-4 bg-accent text-white w-full mt-8 disabled:opacity-50 bg-accent-rp"
-      >
-        {loading ? "Verifying..." : "Submit Changes"}
-      </button>
+      <div className="flex flex-col gap-3">
+        <button
+          onClick={handleSubmit}
+          disabled={loading}
+          className="!p-4 bg-accent text-white w-full mt-8 disabled:opacity-50 bg-accent-rp"
+        >
+          {loading ? "Verifying..." : "Submit Changes"}
+        </button>
+        <button className="btn-accent2-rp !p-4 text-white w-full" onClick={() => nextPage("Others")}>
+          Custom Payment
+        </button>
+      </div>
     </div>
   );
 }
