@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import { PurchaseAgreementService } from "../../Services/pa.service";
+import Loading from "../dialogs/Loading";
+import { toastError, toastSuccess } from "@/sharedComponents/services/ToastContext";
 
 type LotWithTerm = {
   lottype_name: string;
@@ -56,9 +59,29 @@ type Props = {
   beneficiaries: Beneficiary[];
   paymentSchedule: PaymentSchedule | null;
   paymentTerms: PaymentTerm[];
-  onConfirm: () => void;
+  onConfirm: (params: SavePurchaseAgreementParams) => void;
   onClose: () => void;
 };
+
+interface SavePurchaseAgreementParams {
+  adorg: string;
+  mp_i_owner: number;
+  first_beneficiary?: string | null;
+  second_beneficiary?: string | null;
+  mp_i_lot: number;
+  amort_term: number;
+  cnt_months_to_pay: number;
+  amt_sales: number;
+  amt_spotcash?: number | null;
+  amt_spotcash_vat: number;
+  amt_spotcash_pcf?: number | null;
+  amt_amort?: number | null;
+  amt_amort_sales?: number | null;
+  amt_amort_vat?: number | null;
+  amt_amort_pcf?: number | null;
+  amt_contract: number;
+  date_sched_payment: string;
+}
 
 function ordinal(n: number) {
   const s = ["th", "st", "nd", "rd"];
@@ -90,6 +113,7 @@ export default function ReviewAndSign({
   onConfirm,
   onClose,
 }: Props) {
+  const [checking, setChecking] = useState(false);
   const [pricing, setPricing] = useState<PricingData | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -98,10 +122,91 @@ export default function ReviewAndSign({
     return paymentTerms.find((t) => t.id === id);
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    setChecking(true);
     if (!confirmed) return;
+
+    const mpIOwnerRaw = localStorage.getItem("user");
+    const confirmedLotsRaw = sessionStorage.getItem("confirmedLots");
+    const pricingRaw = sessionStorage.getItem("pricing");
+    const beneficiariesRaw = sessionStorage.getItem("beneficiaries");
+    const paymentScheduleRaw = sessionStorage.getItem("paymentSchedule");
+
+    if (
+      !confirmedLotsRaw ||
+      !pricingRaw ||
+      !mpIOwnerRaw ||
+      !beneficiariesRaw ||
+      !paymentScheduleRaw
+    ) {
+      toastError("Missing sessionStorage data");
+      return;
+    }
+
+    const confirmedLots = JSON.parse(confirmedLotsRaw);
+    const pricing = JSON.parse(pricingRaw);
+    const mpIOwner = JSON.parse(mpIOwnerRaw);
+    const beneficiaries = JSON.parse(beneficiariesRaw);
+    const paymentSchedule = JSON.parse(paymentScheduleRaw);
+
+    const selectedLot = confirmedLots?.[0];
+
+    if (!selectedLot) {
+      toastError("No confirmed lot found");
+      return;
+    }
+    const first_beneficiary = beneficiaries?.[0]
+      ? `${beneficiaries[0].firstName} ${beneficiaries[0].middleName ? beneficiaries[0].middleName + " " : ""}${beneficiaries[0].lastName}`
+      : null;
+
+    const second_beneficiary = beneficiaries?.[1]
+      ? `${beneficiaries[1].firstName} ${beneficiaries[1].middleName ? beneficiaries[1].middleName + " " : ""}${beneficiaries[1].lastName}`
+      : null;
+
+    const params: SavePurchaseAgreementParams = {
+      adorg: "162011",
+      mp_i_owner: mpIOwner.mp_i_owner_id,
+      first_beneficiary: first_beneficiary,
+      second_beneficiary: second_beneficiary,
+      mp_i_lot: Number(selectedLot.lot_id),
+
+      amort_term: Number(selectedLot.term_id),
+      cnt_months_to_pay: Number(pricing.contract.numMonths),
+
+      amt_sales: Number(pricing.spotcash.amtSales),
+      amt_spotcash: pricing.spotcash.amtSpotcash ?? null,
+      amt_spotcash_vat: Number(pricing.spotcash.amtVat),
+      amt_spotcash_pcf: Number(pricing.spotcash.amtPcf),
+
+      amt_amort: pricing.amort.amtAmortPrice ?? null,
+      amt_amort_sales: Number(pricing.amort.amtAmortSales),
+      amt_amort_vat: Number(pricing.amort.amtAmortVat),
+      amt_amort_pcf: Number(pricing.amort.amtAmortPcf),
+
+      amt_contract: Number(pricing.contract.amtContract),
+      date_sched_payment: paymentSchedule.fullDate,
+    };
+
     setSubmitted(true);
-    onConfirm();
+    // console.log("Submitting with params:", params);
+    try {
+      const res = await PurchaseAgreementService.savePurchaseAgreement(params);
+      toastSuccess("Purchase agreement saved successfully");
+      sessionStorage.clear();
+    } catch (err: any) {
+      if (err.response) {
+        toastError(
+          "Server responded with:",
+          err.response.status,
+          err.response.data,
+        );
+      } else {
+        toastError("Network or Axios error:", err.message);
+      }
+    } finally {
+      setChecking(false);
+    }
+    onConfirm(params);
   }
 
   useEffect(() => {
@@ -113,6 +218,7 @@ export default function ReviewAndSign({
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
+      {checking && <Loading text="Saving purchase agreement.Please Wait!..." />}
       <div className="bg-white rounded-xl border border-[#d6d3d1] shadow-xl w-full max-w-[520px] overflow-hidden flex flex-col max-h-[90vh]">
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e3da] bg-[#f5f1eb] flex-shrink-0">
@@ -139,7 +245,9 @@ export default function ReviewAndSign({
             <SectionLabel>Selected Lots</SectionLabel>
             <div className="flex flex-col gap-2">
               {confirmedLots.length === 0 ? (
-                <p className="text-[0.8rem] text-[#9a9a9a] italic">No lots selected.</p>
+                <p className="text-[0.8rem] text-[#9a9a9a] italic">
+                  No lots selected.
+                </p>
               ) : (
                 confirmedLots.map((lot) => {
                   const term = termById(lot.term_id);
@@ -186,7 +294,6 @@ export default function ReviewAndSign({
                 <SectionLabel>Pricing Summary</SectionLabel>
 
                 <div className="bg-[#f9f9f7] border border-[#e8e3da] rounded-[8px] overflow-hidden">
-
                   {pricing.lot.amortType === "Spot Cash" ? (
                     /* Spot Cash */
                     <div className="px-3 py-2 border-b border-[#e8e3da]">
@@ -209,14 +316,15 @@ export default function ReviewAndSign({
                       </p>
 
                       <div className="flex justify-between items-center text-[0.8rem]">
-                        <span className="text-[#6b6b6b]">Monthly Amortization:</span>
+                        <span className="text-[#6b6b6b]">
+                          Monthly Amortization:
+                        </span>
                         <span className="font-semibold text-[#060503]">
                           {formatCurrency(pricing.amort.amtAmortPrice)}
                         </span>
                       </div>
                     </div>
                   )}
-
                 </div>
               </div>
 
@@ -230,7 +338,9 @@ export default function ReviewAndSign({
             <SectionLabel>Beneficiaries</SectionLabel>
             <div className="flex flex-col gap-2">
               {beneficiaries.length === 0 ? (
-                <p className="text-[0.8rem] text-[#9a9a9a] italic">No beneficiaries added.</p>
+                <p className="text-[0.8rem] text-[#9a9a9a] italic">
+                  No beneficiaries added.
+                </p>
               ) : (
                 beneficiaries.map((b, i) => (
                   <div
@@ -239,9 +349,13 @@ export default function ReviewAndSign({
                   >
                     <div>
                       <p className="text-[0.85rem] font-medium text-[#060503] leading-tight">
-                        {[b.firstName, b.middleName, b.lastName].filter(Boolean).join(" ") || "—"}
+                        {[b.firstName, b.middleName, b.lastName]
+                          .filter(Boolean)
+                          .join(" ") || "—"}
                       </p>
-                      <p className="text-[0.7rem] text-[#9a9a9a]">Beneficiary {i + 1}</p>
+                      <p className="text-[0.7rem] text-[#9a9a9a]">
+                        Beneficiary {i + 1}
+                      </p>
                     </div>
                   </div>
                 ))
@@ -257,13 +371,17 @@ export default function ReviewAndSign({
             <SectionLabel>Payment Schedule</SectionLabel>
             {paymentSchedule ? (
               <div className="flex items-center justify-between px-3 py-2.5 bg-[#f9f9f7] border border-[#e8e3da] rounded-[8px]">
-                <span className="text-[0.8rem] text-[#6b6b6b]">Payment due every</span>
+                <span className="text-[0.8rem] text-[#6b6b6b]">
+                  Payment due every
+                </span>
                 <span className="text-[0.85rem] font-medium text-[#060503]">
                   {ordinal(paymentSchedule.paymentDay)} of each month
                 </span>
               </div>
             ) : (
-              <p className="text-[0.8rem] text-[#9a9a9a] italic">No payment schedule set.</p>
+              <p className="text-[0.8rem] text-[#9a9a9a] italic">
+                No payment schedule set.
+              </p>
             )}
           </div>
 
@@ -279,8 +397,8 @@ export default function ReviewAndSign({
               className="mt-[2px] w-4 h-4 accent-[#060503] cursor-pointer flex-shrink-0"
             />
             <span className="text-[0.8rem] text-[#6b6b6b] leading-relaxed">
-              I confirm that all the information above is accurate and I agree to
-              proceed with the purchase agreement under the stated terms.
+              I confirm that all the information above is accurate and I agree
+              to proceed with the purchase agreement under the stated terms.
             </span>
           </label>
         </div>
@@ -296,10 +414,11 @@ export default function ReviewAndSign({
           <button
             disabled={!confirmed || submitted}
             onClick={handleSubmit}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm tracking-[0.5px] transition-all ${confirmed && !submitted
-              ? "bg-[#060503] text-[#b28648] hover:bg-[#1a1a1a] shadow-md cursor-pointer"
-              : "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
-              }`}
+            className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm tracking-[0.5px] transition-all ${
+              confirmed && !submitted
+                ? "bg-[#060503] text-[#b28648] hover:bg-[#1a1a1a] shadow-md cursor-pointer"
+                : "bg-[#e8e3da] text-[#b0a898] cursor-not-allowed"
+            }`}
           >
             {submitted ? "Submitted" : "Submit Agreement"}
             {!submitted && (
@@ -316,6 +435,6 @@ export default function ReviewAndSign({
           </button>
         </div>
       </div>
-    </div >
+    </div>
   );
 }

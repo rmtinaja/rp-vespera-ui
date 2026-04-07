@@ -7,8 +7,17 @@ type PaymentSchedule = {
 
 type Props = {
   initialSchedule: PaymentSchedule | null;
-  paymentTerms: { id: string; label: string; sublabel: string; months: number }[];
-  confirmedLots: { lottype_name: string; lot_available: string; term_id: string }[];
+  paymentTerms: {
+    id: string;
+    label: string;
+    sublabel: string;
+    months: number;
+  }[];
+  confirmedLots: {
+    lottype_name: string;
+    lot_available: string;
+    term_id: string;
+  }[];
   onSave: (schedule: PaymentSchedule) => void;
   onClose: () => void;
 };
@@ -27,19 +36,40 @@ export default function PaymentSchedule({
   const [selectedDay, setSelectedDay] = useState<number | null>(
     initialSchedule?.paymentDay ?? null,
   );
+  function formatLocalDate(date: Date) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0"); // months are 0-based
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  }
 
   function handleSave() {
     if (selectedDay === null) return;
-    onSave({
-      scheduleId: crypto.randomUUID(),
-      paymentDay: selectedDay,
-    });
-  }
 
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth();
+
+    let selectedDate = new Date(year, month, selectedDay);
+
+    // Adjust if day exceeds month length
+    const lastDayOfMonth = new Date(year, month + 1, 0).getDate();
+    if (selectedDate.getDate() > lastDayOfMonth) {
+      selectedDate.setDate(lastDayOfMonth);
+    }
+
+    const schedule = {
+      scheduleId: crypto.randomUUID(),
+      paymentDay: selectedDate.getDate(),
+      fullDate: formatLocalDate(selectedDate), // local date string
+    };
+
+    sessionStorage.setItem("paymentSchedule", JSON.stringify(schedule));
+    onSave(schedule);
+  }
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl border border-[#d6d3d1] shadow-xl w-full max-w-[480px] overflow-hidden">
-
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-[#e8e3da] bg-[#f5f1eb]">
           <div>
@@ -60,7 +90,6 @@ export default function PaymentSchedule({
 
         {/* Body */}
         <div className="px-6 py-5">
-
           {/* Day grid */}
           <div className="grid grid-cols-7 gap-[4px]">
             {Array.from({ length: 31 }, (_, i) => i + 1).map((day) => {

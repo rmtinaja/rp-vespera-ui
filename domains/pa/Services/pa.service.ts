@@ -8,6 +8,7 @@ import {
   CheckLotParams,
   CheckAmortizationParams,
   CheckAmortizationResponse,
+  SavePurchaseAgreementParams,
 } from "../DTO/pa.dto";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -37,6 +38,12 @@ export const PurchaseAgreementService = {
     params: CheckAmortizationParams,
   ): Promise<CheckAmortizationResponse> => {
     const res = await axios.get(`${BASE_URL}/pa/calculate-pricing`, { params });
+    return res.data;
+  },
+  savePurchaseAgreement: async (
+    params: SavePurchaseAgreementParams,
+  ): Promise<any> => {
+    const res = await axios.post(`${BASE_URL}/pa/purchase-agreement`, params);
     return res.data;
   },
 };
