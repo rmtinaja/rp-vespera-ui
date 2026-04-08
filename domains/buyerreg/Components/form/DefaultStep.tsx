@@ -2,6 +2,8 @@ import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
 import { ApiService } from "../../Services/ApiService";
 import { SendOtpDTO, CheckMobileDTO } from "../../DTO/BuyerRegDTO";
+import { toastSuccess } from "@/sharedComponents/services/ToastContext";
+import { SendIcon } from "lucide-react";
 
 interface Step1Props {
   nextStep: () => void;
@@ -69,7 +71,7 @@ export default function Step1({ nextStep, setOtpTimer }: Step1Props) {
         message: `Your OTP is ${otp}. It will expire in 5 minutes.`,
       };
       await apiService.sendOtp(dto);
-
+      toastSuccess("OTP sent successfully");
       setOtpTimer(300); // Set timer in parent
       setLocalOtpTimer(300); // Set local timer for display
       nextStep();
@@ -162,14 +164,16 @@ export default function Step1({ nextStep, setOtpTimer }: Step1Props) {
           minLength={11}
           pattern="\d{11}"
           title="Please enter exactly 11 digits"
-          className={`bg-white mt-1 w-full rounded-lg border px-3 py-2 focus:ring-green-500 focus:border-green-500 ${mobileError ? "border-red-500" : "border-gray-300"
-            }`}
+          className={`bg-white mt-1 w-full rounded-lg border px-3 py-2 focus:ring-green-500 focus:border-green-500 ${
+            mobileError ? "border-red-500" : "border-gray-300"
+          }`}
         />
         {checkingMobile && <small className="text-gray-500">Checking...</small>}
         {mobileError && <small className="text-red-500">{mobileError}</small>}
       </div>
 
       <Button
+        unstyled
         type="button"
         onClick={sendOTP}
         disabled={
@@ -180,12 +184,38 @@ export default function Step1({ nextStep, setOtpTimer }: Step1Props) {
           !form.lastName ||
           !!mobileError
         }
+        className={`
+    relative overflow-hidden
+    px-6 py-3 rounded-xl
+    font-medium text-sm tracking-wide
+    transition-all duration-300 ease-in-out
+    flex items-center justify-center gap-2
+    min-w-[160px]
+
+    ${
+      otpTimer > 0 ||
+      loading ||
+      !form.mobile ||
+      !form.firstName ||
+      !form.lastName ||
+      !form.mobile || form.mobile.length !== 11 ||
+      !!mobileError
+        ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+        : "bg-gradient-to-r from-indigo-500 to-purple-600 text-white shadow-md hover:shadow-lg hover:scale-[1.02] active:scale-[0.98]"
+    }
+  `}
       >
-        {otpTimer > 0
-          ? `Resend in ${Math.floor(otpTimer / 60)}:${String(otpTimer % 60).padStart(2, "0")}`
-          : loading
-            ? "Sending..."
-            : "Send OTP"}
+        {loading ? (
+          <>
+            <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            Sending...
+          </>
+        ) : (
+          <>
+            <SendIcon className="w-4 h-4 cursor-not-allowed" />
+            Send OTP
+          </>
+        )}
       </Button>
     </div>
   );

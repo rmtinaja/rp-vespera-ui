@@ -17,7 +17,7 @@ export default function Step3({ nextStep }: Step3Props) {
 
   // Handle input and select changes
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     const updatedForm = { ...form, [name]: value };
@@ -109,7 +109,8 @@ export default function Step3({ nextStep }: Step3Props) {
       {/* Next Button */}
       <div className="mt-4">
         <Button
-          className="w-full justify-center sm:w-1/2 text-white rounded-lg"
+          unstyled
+          className="w-full sm:w-1/2 !bg-blue-500 mb-4 !text-white !rounded-lg !justify-center"
           icon="pi pi-check"
           loading={loading}
           onClick={handleNext}
