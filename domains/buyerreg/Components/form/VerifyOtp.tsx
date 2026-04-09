@@ -2,6 +2,7 @@ import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
 import { ApiService } from "../../Services/ApiService";
 import { OtpVerificationDTO, SendOtpDTO } from "../../DTO/BuyerRegDTO";
+import { toastSuccess } from "@/sharedComponents/services/ToastContext";
 
 interface Step2Props {
   nextStep: () => void;
@@ -49,6 +50,7 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
       };
 
       await apiService.verifyOtp(dto);
+      toastSuccess("OTP verified successfully");
       nextStep();
     } catch (err: any) {
       console.error("OTP verification failed:", err);
@@ -79,7 +81,7 @@ export default function Step2({ nextStep, backStep, otpTimer, setOtpTimer }: Ste
       };
 
       await apiService.sendOtp(dto);
-      
+      toastSuccess("OTP resend successfully");
       sessionStorage.setItem("otp", newOtp);
       
       setOtpTimer(300);
