@@ -7,13 +7,35 @@ import Loading from "@/domains/pa/Components/dialogs/Loading";
 import { ApiService } from "../../Services/ApiService";
 import { ChevronLeft } from "lucide-react";
 
+const theme = {
+  light: {
+    pageBg: "bg-gray-100",
+    cardBg: "bg-white",
+    text: "text-gray-800",
+    border: "border-gray-400",
+    headerBg: "bg-white/90",
+    tableHeader: "bg-gray-200",
+    footerBg: "bg-gray-100",
+  },
+  dark: {
+    pageBg: "bg-gray-900",
+    cardBg: "bg-gray-800",
+    text: "text-white",
+    border: "border-gray-600",
+    headerBg: "bg-gray-900/90",
+    tableHeader: "bg-gray-700",
+    footerBg: "bg-gray-800",
+  },
+};
 export default function CustomerSOA() {
   const [data, setData] = useState<any>(null);
   const router = useRouter();
   const apiService = new ApiService();
   const [checking, setChecking] = useState(false);
   const [selectedLot, setSelectedLot] = useState("");
+  const [mode] = useState<"light" | "dark">("light");
 
+  const t = theme[mode];
   useEffect(() => {
     const saved = sessionStorage.getItem("selectedLot");
     if (saved) {
@@ -143,11 +165,13 @@ export default function CustomerSOA() {
     }
   };
   return (
-    <div className="bg-gray-100 h-screen overflow-y-auto p-4 md:p-6">
+    <div className={`${t.pageBg} h-screen overflow-y-auto p-4 md:p-6`}>
       {checking && <Loading text="Generating amortization schedule..." />}
       {/* NAV */}
       <div className="max-w-6xl mx-auto">
-        <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-md">
+        <nav
+          className={`${t.headerBg} backdrop-blur shadow-md sticky top-0 z-50`}
+        >
           <div className="px-4 md:px-8 flex items-center justify-between h-12">
             <div className="flex items-center gap-3">
               <a
@@ -160,12 +184,12 @@ export default function CustomerSOA() {
               >
                 <ChevronLeft />
               </a>
-              <div className="text-lg font-bold text-gray-800">
+              <div className={`text-lg font-bold ${t.text}`}>
                 Renaissance Park
               </div>
             </div>
             <select
-              className="border rounded-md p-2 text-sm"
+              className={`border ${t.border} rounded-md p-2 text-sm ${t.text}`}
               onChange={handleLotChange}
               value={selectedLot}
             >
@@ -181,7 +205,9 @@ export default function CustomerSOA() {
         </nav>
       </div>
       <div className="h-6" />
-      <div className="max-w-6xl mx-auto bg-white p-4 md:p-8 shadow-lg rounded-lg">
+      <div
+        className={`max-w-6xl mx-auto ${t.cardBg} ${t.text} p-4 md:p-8 shadow-lg rounded-lg`}
+      >
         {/* HEADER */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-start gap-3">
@@ -207,7 +233,7 @@ export default function CustomerSOA() {
         {/* CUSTOMER INFO */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 border border-gray-400 mb-6">
           {ownerInfo.length > 0 && (
-            <>
+            <div className={`grid md:grid-cols-3 border ${t.border} mb-6`}>
               <div className="p-2 border-b md:border-b-0 md:border-r">
                 <p className="font-bold">Customer's Name</p>
                 <p>{ownerInfo[0].name1}</p>
@@ -220,15 +246,15 @@ export default function CustomerSOA() {
                 <p className="font-bold">Email Address</p>
                 <p>{ownerInfo[0].email_address}</p>
               </div>
-            </>
+            </div>
           )}
         </div>
 
         {/* OUTSTANDING CONTRACT */}
         <h3 className="font-semibold mb-2 text-center">OUTSTANDING CONTRACT</h3>
         <div className="overflow-x-auto md:overflow-visible mb-6">
-          <table className="min-w-[900px] md:min-w-full border border-gray-400 text-xs">
-            <thead className="bg-gray-200">
+          <table className="min-w-[900px] md:min-w-full border ${t.border} text-xs">
+            <thead className={t.tableHeader}>
               <tr>
                 <th className="border p-1">P.A No.</th>
                 <th className="border p-1">Lot Info</th>
@@ -343,16 +369,16 @@ export default function CustomerSOA() {
 
         {/* ACCELERATION BALANCE */}
         <div className="flex items-center justify-center space-x-6 mb-6">
-          <h3 className="text-md font-medium">Acceleration Balance To Pay:</h3>
+          <h3 className="text-md text-[clamp(12px,2vw,16px)]">Acceleration Balance To Pay:</h3>
           {acceleration.length === 0 ? (
             <span className="text-gray-400">No Data</span>
           ) : (
             acceleration.map((row: any, i: number) => (
               <React.Fragment key={i}>
-                <span className="px-3 py-1 bg-gray-50 rounded shadow font-semibold">
+                <span className="px-3 py-1 bg-gray-50 rounded shadow font-semibold text-[clamp(12px,2vw,16px)]">
                   lot - {row.lotnum}
                 </span>
-                <span className="px-3 py-1 bg-gray-50 rounded shadow font-semibold">
+                <span className="px-3 py-1 bg-gray-50 rounded shadow font-semibold text-[clamp(12px,2vw,16px)]">
                   {parseFloat(row.amt_accel_gross).toFixed(2)}
                 </span>
               </React.Fragment>
@@ -437,7 +463,7 @@ export default function CustomerSOA() {
         </div>
 
         {/* FOOTER */}
-        <div className="flex justify-between mt-6 text-[10px] md:text-xs">
+        <div className={`mt-6 text-xs ${t.text} justify-between flex`}>
           <span>Date Printed: {new Date().toLocaleDateString()}</span>
           <span>Page 1 of 1</span>
         </div>

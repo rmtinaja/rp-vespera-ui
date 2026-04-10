@@ -120,9 +120,15 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-[90%] text-center space-y-4">
+      <div
+        className="
+      bg-white dark:bg-gray-900 
+      text-gray-900 dark:text-gray-100
+      rounded-xl shadow-2xl p-8 max-w-md w-[90%] text-center space-y-4
+    "
+      >
         {/* HEADER */}
-        <h2 className="text-2xl font-bold text-green-700">
+        <h2 className="text-2xl font-bold text-green-700 dark:text-green-400">
           Is this your information?
         </h2>
 
@@ -136,20 +142,28 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
 
         {/* SEND OTP */}
         {!otpSent && (
-          <div className="bg-green-50 border p-6 rounded-xl space-y-4">
-            <h3 className="text-sm font-semibold text-green-700">
+          <div
+            className="
+          bg-green-50 dark:bg-gray-800 
+          border dark:border-gray-700
+          p-6 rounded-xl space-y-4
+        "
+          >
+            <h3 className="text-sm font-semibold text-green-700 dark:text-green-300">
               Send One-Time Password (OTP)
             </h3>
 
             {error && (
-              <div className="bg-red-100 text-red-700 p-2 rounded">{error}</div>
+              <div className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-200 p-2 rounded">
+                {error}
+              </div>
             )}
 
             <div className="flex justify-center gap-4">
               <button
                 onClick={handleSendOtp}
                 disabled={otpSending}
-                className="bg-green-600 text-white px-6 py-2 rounded-lg"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg"
               >
                 {otpSending ? "Sending..." : "Send OTP"}
               </button>
@@ -159,7 +173,7 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
                   onClose();
                   sessionStorage.removeItem("customerDetails");
                 }}
-                className="bg-gray-200 px-6 py-2 rounded-lg"
+                className="bg-gray-200 dark:bg-gray-700 dark:text-white px-6 py-2 rounded-lg"
               >
                 No
               </button>
@@ -175,13 +189,24 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
               maxLength={6}
               value={otp}
               onChange={(e) => setOtp(e.target.value)}
-              className="w-full p-3 border rounded-lg text-center"
+              className="
+              w-full p-3 border rounded-lg text-center
+              bg-white dark:bg-gray-800
+              border-gray-300 dark:border-gray-600
+              text-black dark:text-white
+            "
               placeholder="Enter OTP"
             />
 
-            {error && <p className="text-red-600 text-sm">{error}</p>}
+            {error && (
+              <p className="text-red-600 dark:text-red-400 text-sm">{error}</p>
+            )}
 
-            <p className="text-green-600 font-semibold flex items-center gap-2 justify-center">
+            <p
+              className="font-semibold flex items-center gap-2 justify-center
+            text-green-600 dark:text-green-400
+          "
+            >
               {timer > 0 ? (
                 <>
                   <Clock size={16} />
@@ -194,10 +219,15 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
                 </>
               )}
             </p>
+
             <button
               onClick={handleVerifyOtp}
               disabled={otpVerifying || timer === 0}
-              className="w-full bg-blue-500 text-white p-3 rounded-lg"
+              className="
+              w-full bg-blue-500 hover:bg-blue-600
+              text-white p-3 rounded-lg
+              disabled:opacity-50
+            "
             >
               {otpVerifying ? "Verifying..." : "Verify OTP"}
             </button>
@@ -205,7 +235,7 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
             {timer === 0 && (
               <button
                 onClick={handleResend}
-                className="mt-2 px-4 py-2 bg-gray-200 rounded-lg"
+                className="mt-2 px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg"
               >
                 Resend OTP
               </button>
