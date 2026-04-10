@@ -143,7 +143,7 @@ export default function CustomerSOA() {
     }
   };
   return (
-    <div className="bg-gray-100 min-h-screen overflow-y-auto p-4 md:p-6">
+    <div className="bg-gray-100 h-screen overflow-y-auto p-4 md:p-6">
       {checking && <Loading text="Generating amortization schedule..." />}
       {/* NAV */}
       <div className="max-w-6xl mx-auto">
