@@ -20,7 +20,6 @@ export default function SoaForm() {
   const [result, setResult] = useState<any>(null);
   const [showOtpModal, setShowOtpModal] = useState(false);
 
-  // ✅ LOAD FROM SESSION STORAGE
   useEffect(() => {
     const savedForm = sessionStorage.getItem("soaForm");
     if (savedForm) {
@@ -38,11 +37,9 @@ export default function SoaForm() {
     setForm(updatedForm);
     setErrors({ ...errors, [e.target.name]: "" });
 
-    // ✅ SAVE TO SESSION STORAGE
     sessionStorage.setItem("soaForm", JSON.stringify(updatedForm));
   };
 
-  // 🔹 Validation using toast
   const validate = () => {
     if (!form.firstname.trim()) {
       toastError("First name is required");
@@ -147,6 +144,7 @@ export default function SoaForm() {
               <input
                 type="text"
                 name="firstname"
+                autoComplete="off"
                 value={form.firstname}
                 onChange={handleChange}
                 className={`w-full mt-1 rounded-lg px-3 py-2 border focus:ring-2 focus:ring-green-400 outline-none
@@ -162,6 +160,7 @@ export default function SoaForm() {
               <input
                 type="text"
                 name="middlename"
+                autoComplete="off"
                 maxLength={1}
                 value={form.middlename}
                 onChange={handleChange}
@@ -177,6 +176,7 @@ export default function SoaForm() {
               <input
                 type="text"
                 name="lastname"
+                autoComplete="off"
                 value={form.lastname}
                 onChange={handleChange}
                 className={`w-full mt-1 rounded-lg px-3 py-2 border focus:ring-2 focus:ring-green-400 outline-none

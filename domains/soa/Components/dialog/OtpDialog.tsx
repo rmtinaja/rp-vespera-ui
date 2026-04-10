@@ -4,6 +4,7 @@ import { toastSuccess } from "@/sharedComponents/services/ToastContext";
 import { useEffect, useState } from "react";
 import CustomerSOA from "../form/CustomerSoa";
 import { useRouter } from "next/navigation";
+import { AlertCircle, Clock } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -17,7 +18,7 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [otpVerifying, setOtpVerifying] = useState(false);
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(300);
   const [timerActive, setTimerActive] = useState(false);
   const [error, setError] = useState("");
   const [reportData, setReportData] = useState(null);
@@ -39,8 +40,8 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
   }, [timerActive, timer]);
 
   const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 600);
-    const s = seconds % 600;
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
     return `${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`;
   };
 
@@ -58,7 +59,7 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
       });
 
       setOtpSent(true);
-      setTimer(60);
+      setTimer(300);
       setTimerActive(true);
     } catch (err: any) {
       setError(err.message || "Failed to send OTP");
@@ -98,7 +99,7 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
         sessionStorage.setItem("reportData", JSON.stringify(reportResult));
         setReportData(reportResult?.data);
 
-        if (reportData) {
+        if (reportResult?.data) {
           router.push("/soa/customersoa");
         }
       }
@@ -117,7 +118,6 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
   };
 
   if (!open) return null;
-
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
       <div className="bg-white rounded-xl shadow-2xl p-8 max-w-md w-[90%] text-center space-y-4">
@@ -151,7 +151,7 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
                 disabled={otpSending}
                 className="bg-green-600 text-white px-6 py-2 rounded-lg"
               >
-                {otpSending ? "Sending..." : "Yes, Send OTP"}
+                {otpSending ? "Sending..." : "Send OTP"}
               </button>
 
               <button
@@ -181,10 +181,19 @@ export default function OtpDialog({ open, onClose, data, apiService }: Props) {
 
             {error && <p className="text-red-600 text-sm">{error}</p>}
 
-            <p className="text-green-600 font-semibold">
-              {timer > 0 ? formatTime(timer) : "OTP expired. Please resend."}
+            <p className="text-green-600 font-semibold flex items-center gap-2 justify-center">
+              {timer > 0 ? (
+                <>
+                  <Clock size={16} />
+                  {formatTime(timer)}
+                </>
+              ) : (
+                <>
+                  <AlertCircle size={16} className="text-red-500" />
+                  OTP expired. Please resend.
+                </>
+              )}
             </p>
-
             <button
               onClick={handleVerifyOtp}
               disabled={otpVerifying || timer === 0}

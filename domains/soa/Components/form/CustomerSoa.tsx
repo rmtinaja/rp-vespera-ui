@@ -3,44 +3,69 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import Loading from "@/domains/pa/Components/dialogs/Loading";
+import { ApiService } from "../../Services/ApiService";
+import { ChevronLeft } from "lucide-react";
 
 export default function CustomerSOA() {
   const [data, setData] = useState<any>(null);
   const router = useRouter();
+  const apiService = new ApiService();
+  const [checking, setChecking] = useState(false);
+  const [selectedLot, setSelectedLot] = useState("");
 
+  useEffect(() => {
+    const saved = sessionStorage.getItem("selectedLot");
+    if (saved) {
+      setSelectedLot(saved);
+    }
+  }, []);
   useEffect(() => {
     const encodedData = sessionStorage.getItem("reportData");
 
-    if (encodedData) {
-      try {
-        const parsedData = JSON.parse(encodedData);
-        if (parsedData.success) {
-          setData(parsedData.data);
-        }
-      } catch (error) {
-        console.error("Failed to parse sessionStorage data:", error);
-      }
+    if (!encodedData) {
+      router.replace("/soa");
+      return;
     }
 
-    // Set timeout for 10 minutes (600,000 ms)
+    try {
+      const parsed = JSON.parse(encodedData);
+
+      if (!parsed?.success || !parsed?.data) {
+        sessionStorage.removeItem("reportData");
+        router.replace("/soa");
+        return;
+      }
+
+      setData(parsed.data);
+    } catch (error) {
+      sessionStorage.removeItem("reportData");
+      router.replace("/soa");
+      return;
+    }
+
     const timeout = setTimeout(() => {
       sessionStorage.removeItem("reportData");
-      router.push("/soa"); // Redirect after deletion
-    // }, 600000);
-    }, 60);
+      sessionStorage.removeItem("customerDetails");
+      router.replace("/soa");
+    }, 600000);
 
-    // Cleanup on unmount
     return () => clearTimeout(timeout);
   }, [router]);
 
   if (!data) {
-    return <div className="p-4">Loading data...</div>;
+    return <Loading text="Generating Soa..." />;
   }
 
-  const { ownerInfo, ownerLot, summary, payments, acceleration, breakdown } =
-    data;
+  const {
+    ownerInfo = [],
+    ownerLot = [],
+    summary = [],
+    payments = [],
+    acceleration = [],
+    breakdown = [],
+  } = data;
 
-  // Totals
   const totalContract = summary.reduce(
     (acc: number, item: any) => acc + parseFloat(item.amtcontract),
     0,
@@ -61,35 +86,102 @@ export default function CustomerSOA() {
     (acc: number, row: any) => acc + parseFloat(row.dateRangebalance),
     0,
   );
+  const handleLotChange = async (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedLotId = e.target.value;
+    setSelectedLot(selectedLotId);
+    sessionStorage.setItem("selectedLot", selectedLotId);
+    setChecking(true);
 
+    try {
+      const encodedData = sessionStorage.getItem("customerDetails");
+
+      if (!encodedData) {
+        router.push("/soa");
+        return;
+      }
+
+      let customerDetails;
+
+      try {
+        customerDetails = JSON.parse(atob(encodedData));
+      } catch {
+        customerDetails = JSON.parse(encodedData);
+      }
+
+      // 👇 ALL selected
+      if (!selectedLotId) {
+        const reportResult = await apiService.soaCustomerReport({
+          bparId: String(customerDetails.data.bpar_i_person_id),
+          ownerId: String(customerDetails.data.mp_i_owner_id),
+          lot: "ALL",
+          lotIds: ownerLot.map((l: any) => Number(l.mp_i_lot_id)),
+        });
+
+        sessionStorage.setItem("reportData", JSON.stringify(reportResult));
+        router.push("/soa/customersoa");
+        return;
+      }
+
+      // 👇 SINGLE LOT
+      const selectedLot = ownerLot.find(
+        (lot: any) => String(lot.mp_i_lot_id) === String(selectedLotId),
+      );
+
+      if (!selectedLot) return;
+
+      const reportResult = await apiService.soaCustomerReport({
+        bparId: String(customerDetails.data.bpar_i_person_id),
+        ownerId: String(customerDetails.data.mp_i_owner_id),
+        lot: selectedLot.lot,
+        lotIds: [Number(selectedLot.mp_i_lot_id)],
+      });
+
+      sessionStorage.setItem("reportData", JSON.stringify(reportResult));
+      router.push("/soa/customersoa");
+    } finally {
+      setChecking(false);
+    }
+  };
   return (
-    <div className="bg-gray-100 p-4 md:p-6">
+    <div className="bg-gray-100 min-h-screen overflow-y-auto p-4 md:p-6">
+      {checking && <Loading text="Generating amortization schedule..." />}
       {/* NAV */}
-      <nav className="bg-white shadow-md rounded-lg mb-6">
-        <div className="max-w-6xl mx-auto px-4 md:px-8 flex items-center justify-between h-12">
-          <div className="flex items-center gap-3">
-            <a
-              href="#"
-              className="bg-[#0A352D] text-white w-9 h-9 rounded-full shadow hover:bg-green-700 transition flex items-center justify-center"
-            >
-              <i className="fa-solid fa-chevron-left text-sm"></i>
-            </a>
-            <div className="text-lg font-bold text-gray-800">
-              Renaissance Park
+      <div className="max-w-6xl mx-auto">
+        <nav className="sticky top-0 z-50 bg-white/90 backdrop-blur shadow-md">
+          <div className="px-4 md:px-8 flex items-center justify-between h-12">
+            <div className="flex items-center gap-3">
+              <a
+                href="/soa"
+                onClick={() => {
+                  sessionStorage.removeItem("reportData");
+                  sessionStorage.removeItem("customerDetails");
+                }}
+                className="bg-[#0A352D] text-white w-9 h-9 rounded-full shadow hover:bg-green-700 transition flex items-center justify-center"
+              >
+                <ChevronLeft />
+              </a>
+              <div className="text-lg font-bold text-gray-800">
+                Renaissance Park
+              </div>
             </div>
-          </div>
-          <select className="border rounded-md p-2 text-sm">
-            <option value="all">All</option>
-            {ownerLot.map((lot: any) => (
-              <option key={lot.mp_i_lot_id} value={lot.mp_i_lot_id}>
-                {lot.lot}
-              </option>
-            ))}
-          </select>
-        </div>
-      </nav>
+            <select
+              className="border rounded-md p-2 text-sm"
+              onChange={handleLotChange}
+              value={selectedLot}
+            >
+              <option value="">All</option>
 
-      <div className="max-w-6xl mx-auto bg-white p-4 md:p-8 shadow-lg rounded-lg text-xs md:text-sm text-gray-800">
+              {ownerLot.map((lot: any) => (
+                <option key={lot.mp_i_lot_id} value={lot.mp_i_lot_id}>
+                  {lot.lot}
+                </option>
+              ))}
+            </select>
+          </div>
+        </nav>
+      </div>
+      <div className="h-6" />
+      <div className="max-w-6xl mx-auto bg-white p-4 md:p-8 shadow-lg rounded-lg">
         {/* HEADER */}
         <div className="flex items-start justify-between mb-6">
           <div className="flex items-start gap-3">
@@ -103,7 +195,7 @@ export default function CustomerSOA() {
           </div>
           <div className="text-right leading-tight">
             <h2 className="text-lg md:text-xl font-bold">
-              STATEMENT OF ACCOUNTS
+              STATEMENT OF ACCOUNT
             </h2>
             <p className="font-medium font-semibold">For Lot Installments</p>
             <p className="text-[10px] md:text-xs">
