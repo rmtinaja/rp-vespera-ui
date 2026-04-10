@@ -55,9 +55,16 @@ export default function TransactionList({
           <thead className="bg-accent-rp text-left">
             <tr>
               <th>ID</th>
-              <th>Name</th>
-              <th>Reference Number</th>
-              <th>Lot</th>
+              {title == "For Unknown Receipt" &&
+                <th>Description</th>
+              }
+              {title != "For Unknown Receipt" &&
+                <>
+                  <th>Name</th>
+                  <th>Reference Number</th>
+                  <th>Lot</th>
+                </>
+              }
               <th>Total</th>
               {title == "Paid Transactions" &&
                 <>
@@ -87,9 +94,16 @@ export default function TransactionList({
               transactions.map((t) => (
                 <tr key={t.id}>
                   <td>{t.id}</td>
-                  <td>{t.name}</td>
-                  <td>{t.reference_number}</td>
-                  <td>{t.lot_number}</td>
+                  {title == "For Unknown Receipt" &&
+                    <td>{t.description}</td>
+                  }
+                  {title != "For Unknown Receipt" &&
+                    <>
+                      <td>{t.name}</td>
+                      <td>{t.reference_number}</td>
+                      <td>{t.lot_number}</td>
+                    </>
+                  }
                   <td>₱ {t.total_payment}</td>
                   {title == "Paid Transactions" &&
                     <>

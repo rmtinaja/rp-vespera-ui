@@ -116,3 +116,9 @@ export async function getCancelled() {
   })
   return res.json()
 }
+export async function getUnknown() {
+  const res = await fetch(`${BASE_URL}/transactions/getUnknown`, {
+    cache: 'no-store'
+  })
+  return res.json()
+}
