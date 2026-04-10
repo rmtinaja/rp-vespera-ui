@@ -3,7 +3,11 @@ import { Button } from "primereact/button";
 import { ApiService } from "../../Services/ApiService";
 import { VerifyIdDTO } from "../../DTO/BuyerRegDTO";
 import { Camera, Upload, X, ZoomIn, ZoomOut, RotateCw } from "lucide-react";
-import { toastError, toastSuccess, toastWarn } from "@/sharedComponents/services/ToastContext";
+import {
+  toastError,
+  toastSuccess,
+  toastWarn,
+} from "@/sharedComponents/services/ToastContext";
 
 interface Step5Props {
   nextStep: () => void;
@@ -18,7 +22,10 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
   const [zoom, setZoom] = useState(1);
   const [rotation, setRotation] = useState(0);
   const [loaded, setLoaded] = useState(false);
-  const [naturalSize, setNaturalSize] = useState<{ w: number; h: number } | null>(null);
+  const [naturalSize, setNaturalSize] = useState<{
+    w: number;
+    h: number;
+  } | null>(null);
 
   const imgRef = useRef<HTMLImageElement>(null);
   const apiService = new ApiService();
@@ -105,7 +112,12 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
   };
 
   // Cleanup preview URL
-  useEffect(() => () => { if (preview) URL.revokeObjectURL(preview); }, [preview]);
+  useEffect(
+    () => () => {
+      if (preview) URL.revokeObjectURL(preview);
+    },
+    [preview],
+  );
 
   const handleLoad = () => {
     if (imgRef.current) {
@@ -139,7 +151,8 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
       </h2>
 
       <p className="text-xs text-gray-500 mb-2">
-        Upload any valid government ID (front only is enough to start) or capture a new one.
+        Upload any valid government ID (front only is enough to start) or
+        capture a new one.
       </p>
 
       <div className="space-y-4">
@@ -152,30 +165,63 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
                 {form.govId?.name || "ID Preview"}
               </span>
               <div className="flex items-center gap-2">
-                <button type="button" onClick={handleZoomOut} disabled={zoom <= 0.5} className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-40">
+                <button
+                  type="button"
+                  onClick={handleZoomOut}
+                  disabled={zoom <= 0.5}
+                  className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-40"
+                >
                   <ZoomOut className="w-4 h-4 text-gray-600" />
                 </button>
-                <span className="text-xs text-gray-400 w-10 text-center">{Math.round(zoom * 100)}%</span>
-                <button type="button" onClick={handleZoomIn} disabled={zoom >= 3} className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-40">
+                <span className="text-xs text-gray-400 w-10 text-center">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={handleZoomIn}
+                  disabled={zoom >= 3}
+                  className="p-1.5 rounded-full hover:bg-gray-100 disabled:opacity-40"
+                >
                   <ZoomIn className="w-4 h-4 text-gray-600" />
                 </button>
-                <button type="button" onClick={handleRotate} className="p-1.5 rounded-full hover:bg-gray-100">
+                <button
+                  type="button"
+                  onClick={handleRotate}
+                  className="p-1.5 rounded-full hover:bg-gray-100"
+                >
                   <RotateCw className="w-4 h-4 text-gray-600" />
                 </button>
-                <button type="button" onClick={handleRemove} className="p-1.5 rounded-full hover:bg-red-50">
+                <button
+                  type="button"
+                  onClick={handleRemove}
+                  className="p-1.5 rounded-full hover:bg-red-50"
+                >
                   <X className="w-4 h-4 text-red-500" />
                 </button>
               </div>
             </div>
 
             {/* Image viewport */}
-            <div className="relative w-full overflow-auto bg-gray-100" style={{ minHeight: "200px", maxHeight: "300px" }}>
+            <div
+              className="relative w-full overflow-auto bg-gray-100"
+              style={{ minHeight: "200px", maxHeight: "300px" }}
+            >
               {!loaded && (
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-12 h-12 rounded-full border-4 border-gray-300 border-t-green-500 animate-spin" />
                 </div>
               )}
-              <div className="flex items-center justify-center" style={{ minHeight: "200px", padding: "12px", minWidth: isRotated90or270 && naturalSize ? `${naturalSize.h * zoom}px` : undefined }}>
+              <div
+                className="flex items-center justify-center"
+                style={{
+                  minHeight: "200px",
+                  padding: "12px",
+                  minWidth:
+                    isRotated90or270 && naturalSize
+                      ? `${naturalSize.h * zoom}px`
+                      : undefined,
+                }}
+              >
                 <img
                   ref={imgRef}
                   src={preview}
@@ -198,7 +244,9 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
 
             {loaded && naturalSize && (
               <div className="px-3 py-1.5 border-t border-gray-200 bg-white">
-                <p className="text-xs text-gray-400">{naturalSize.w} × {naturalSize.h}px</p>
+                <p className="text-xs text-gray-400">
+                  {naturalSize.w} × {naturalSize.h}px
+                </p>
               </div>
             )}
           </div>
@@ -207,15 +255,34 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
         {/* Upload & Camera */}
         <div className="flex flex-row justify-start gap-6">
           <div>
-            <input id="file-input" type="file" accept="image/*" onChange={handleChange} className="hidden" />
-            <label htmlFor="file-input" className="flex flex-col items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200">
+            <input
+              id="file-input"
+              type="file"
+              accept="image/*"
+              onChange={handleChange}
+              className="hidden"
+            />
+            <label
+              htmlFor="file-input"
+              className="flex flex-col items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200"
+            >
               <Upload className="w-6 h-6 text-gray-700" />
               <span className="text-xs text-gray-600 mt-1">Upload</span>
             </label>
           </div>
           <div>
-            <input id="camera-input" type="file" accept="image/*" capture="environment" onChange={handleChange} className="hidden" />
-            <label htmlFor="camera-input" className="flex flex-col items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200">
+            <input
+              id="camera-input"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleChange}
+              className="hidden"
+            />
+            <label
+              htmlFor="camera-input"
+              className="flex flex-col items-center justify-center w-16 h-16 bg-gray-100 rounded-full cursor-pointer hover:bg-gray-200"
+            >
               <Camera className="w-6 h-6 text-gray-700" />
               <span className="text-xs text-gray-600 mt-1">Camera</span>
             </label>
@@ -231,7 +298,13 @@ export default function Step5({ backStep, nextStep }: Step5Props) {
 
         {/* Navigation Buttons */}
         <div className="flex gap-2 pt-4">
-          <button type="button" onClick={backStep} className="w-1/2 py-2 bg-gray-500 text-white rounded-lg">Back</button>
+          <button
+            type="button"
+            onClick={backStep}
+            className="w-1/2 py-2 bg-gray-500 text-white rounded-lg"
+          >
+            Back
+          </button>
           <Button
             icon="pi pi-check"
             loading={loading}

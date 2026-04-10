@@ -62,7 +62,7 @@ export default function CustomerReg() {
           className="w-[50%] h-auto mb-4 justify-self-center"
         />
 
-        <div className="flex h-auto w-full flex-col rounded-2xl shadow-xl bgSecondary forms">
+        <div className="flex h-[80vh] w-full flex-col rounded-2xl shadow-xl bgSecondary forms">
           <div className="border-b px-8 pb-4 pt-6 text-center">
             <h2 className="text-2xl font-semibold text-gray-800">
               Buyer Registration
@@ -117,7 +117,7 @@ export default function CustomerReg() {
         />
 
         {/* Card Container */}
-        <div className="flex flex-col bg-[#faf8f4] rounded-2xl px-4 sm:px-6 md:px-8 py-6 sm:py-8">
+        <div className="flex flex-col h-[85vh] bg-[#faf8f4] rounded-2xl px-4 sm:px-6 md:px-8 py-6 sm:py-8">
           {/* Header */}
           <div className="border-b border-[#d6d3d1] pb-4 mb-4 text-center">
             <h2 className="text-xl sm:text-2xl md:text-3xl font-serif font-medium text-[#060503]">

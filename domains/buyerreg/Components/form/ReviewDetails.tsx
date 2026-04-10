@@ -77,12 +77,15 @@ export default function Step7({ backStep }: Step7Props) {
         ip: ip,
       });
 
-      localStorage.clear();
+      // localStorage.clear();
       if (loginRes.success) {
         document.cookie = `token=${loginRes.token}; path=/`;
         setSessionData({});
 
-        router.push("/");
+        setTimeout(() => {
+          router.push("/");
+          router.refresh();
+        }, 100);
         router.refresh();
       } else {
         router.push("/auth/login");

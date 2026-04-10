@@ -60,7 +60,7 @@ export default function LoginUserComponent() {
 
   return (
     <div className="h-screen overflow-hidden bg-[#f7f7f7] flex items-center justify-center">
-      {loading && <Loading text="Saving purchase agreement.Please Wait!..." />}
+      {loading && <Loading text="Logging in.Please Wait!..." />}
       <div className="w-full max-w-[1200px] h-[90vh] flex rounded-[4px] overflow-hidden">
         <div className="w-full lg:w-[420px] bg-white border border-[#eaeae8] flex flex-col justify-center px-10">
           <div className="mb-10">

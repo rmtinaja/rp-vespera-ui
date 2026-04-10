@@ -16,7 +16,6 @@ export default function Header() {
     setIsLoggedIn(!!token);
   }, []);
 
-  
   return (
     <>
       <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -257,12 +256,16 @@ export default function Header() {
             </li>
 
             <li className="pt-4 border-t">
-              <button className="w-full mb-2 px-4 py-2 bg-[#34554f] text-white rounded">
-                Sign Up
-              </button>
-              <button className="w-full px-4 py-2 bg-[#34554f] text-white rounded">
-                Register
-              </button>
+              <Link href="/auth/login">
+                <button className="w-full mb-2 px-4 py-2 bg-[#34554f] text-white rounded">
+                  Sign Up
+                </button>
+              </Link>
+              <Link href="/auth/register">
+                <button className="w-full px-4 py-2 bg-[#34554f] text-white rounded">
+                  Register
+                </button>
+              </Link>
             </li>
           </ul>
         </div>

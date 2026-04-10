@@ -6,8 +6,9 @@ import Beneficiaries from "./forms/Beneficiaries";
 import PaymentSchedule from "./forms/PaymentSchedule";
 import ReviewAndSign from "./forms/ReviewAndSign";
 import { PurchaseAgreementService } from "../Services/pa.service";
-import { Toast } from "primereact/toast";
-import { Button } from "primereact/button";
+import { useRouter } from "next/navigation";
+import { ChevronLeft } from "lucide-react";
+import "../../pa/Components/scss/pa.scss";
 
 type LotWithTerm = {
   lottype_name: string;
@@ -47,9 +48,28 @@ export default function PurchaseAgreement() {
   const [paymentSchedule, setPaymentSchedule] =
     useState<PaymentScheduleType | null>(null);
   const [submitted, setSubmitted] = useState(false);
-
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
+  const router = useRouter();
+  useEffect(() => {
+    const ipMatch = localStorage.getItem("ip_match");
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+
+    const isValid =
+      ipMatch !== null &&
+      ipMatch !== "" &&
+      token !== null &&
+      token !== "" &&
+      user !== null &&
+      user !== "";
+
+    setIsAuthorized(isValid);
+    if (!isValid) {
+      router.push("/auth/login");
+    }
+  }, []);
 
   // ── Load session data
   useEffect(() => {
@@ -179,8 +199,17 @@ export default function PurchaseAgreement() {
 
   return (
     <>
-      <div className="min-h-screen bg-[#f7f7f7] flex items-center justify-center p-8 font-sans">
-        <div className="bg-white rounded-xl border border-[#d6d3d1] p-10 max-w-[720px] w-full shadow-[0_4px_12px_rgba(0,0,0,0.05)]">
+      <button
+        onClick={() => {
+          router.push("/");
+        }}
+        className="fixed top-11 right-10 bg-black border border-[#d6d3d1] text-[#fff] 
+                 px-3 py-2 rounded-full text-sm z-50"
+      >
+        <ChevronLeft />
+      </button>
+      <div className="pa min-h-screen flex items-center justify-center p-8 font-sans">
+        <div className="relative z-10 bg-white rounded-xl border border-[#d6d3d1] p-10 max-w-[720px] w-full shadow-[0_4px_12px_rgba(0,0,0,0.5)]">
           <h1 className="font-serif text-[2rem] font-medium text-[#060503] mb-2">
             Purchase Agreement
           </h1>

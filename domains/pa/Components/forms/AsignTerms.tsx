@@ -86,13 +86,11 @@ export default function AssignTerms({
 
       const data = res.data;
 
-      // ✅ update state
       setPricing((prev) => ({
         ...prev,
         [lotKey]: data,
       }));
 
-      // ✅ persist
       sessionStorage.setItem(`pricing`, JSON.stringify(data));
     } catch (err) {
       console.error("Failed to fetch amortization:", err);

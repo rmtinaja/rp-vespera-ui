@@ -167,7 +167,7 @@ export default function Step6({ nextStep, backStep }: Step6Props) {
       {/* Buttons */}
       <div className="flex gap-2 pt-4">
         <button
-          className="bg-accent text-white w-1/2 py-2 rounded-lg"
+          className="bgAccent text-white w-1/2 py-2 rounded-lg"
           onClick={async () => {
             setLoading(true);
             try {

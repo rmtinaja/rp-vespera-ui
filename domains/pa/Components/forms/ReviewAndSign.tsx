@@ -1,7 +1,12 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PurchaseAgreementService } from "../../Services/pa.service";
 import Loading from "../dialogs/Loading";
-import { toastError, toastSuccess } from "@/sharedComponents/services/ToastContext";
+import {
+  toastError,
+  toastSuccess,
+} from "@/sharedComponents/services/ToastContext";
+import { Check } from "lucide-react";
+import { refresh } from "next/cache";
 
 type LotWithTerm = {
   lottype_name: string;
@@ -81,6 +86,7 @@ interface SavePurchaseAgreementParams {
   amt_amort_pcf?: number | null;
   amt_contract: number;
   date_sched_payment: string;
+  signature: string;
 }
 
 function ordinal(n: number) {
@@ -117,13 +123,74 @@ export default function ReviewAndSign({
   const [pricing, setPricing] = useState<PricingData | null>(null);
   const [confirmed, setConfirmed] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-
+  const [isSaved, setIsSaved] = useState(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [drawing, setDrawing] = useState(false);
+  const [signature, setSignature] = useState<string | null>(null);
+  const [isDrawingDisabled, setIsDrawingDisabled] = useState(false);
   function termById(id: string) {
     return paymentTerms.find((t) => t.id === id);
   }
+  function startDrawing(e: any) {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.beginPath();
+    ctx.moveTo(getX(e), getY(e));
+    setDrawing(true);
+  }
+
+  function draw(e: any) {
+    if (!drawing) return;
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.lineTo(getX(e), getY(e));
+    ctx.stroke();
+  }
+
+  function stopDrawing() {
+    setDrawing(false);
+  }
+
+  function getX(e: any) {
+    const canvas = canvasRef.current!;
+    return (
+      (e.touches ? e.touches[0].clientX : e.clientX) -
+      canvas.getBoundingClientRect().left
+    );
+  }
+
+  function getY(e: any) {
+    const canvas = canvasRef.current!;
+    return (
+      (e.touches ? e.touches[0].clientY : e.clientY) -
+      canvas.getBoundingClientRect().top
+    );
+  }
+
+  function handleSaveSignature() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const dataUrl = canvas.toDataURL("image/png");
+
+    setSignature(dataUrl);
+    sessionStorage.setItem("signature", dataUrl);
+
+    setIsSaved(true);
+    setIsDrawingDisabled(true);
+    toastSuccess("Signature saved!");
+  }
   async function handleSubmit() {
-    setChecking(true);
+    // setChecking(true);
     if (!confirmed) return;
 
     const mpIOwnerRaw = localStorage.getItem("user");
@@ -131,13 +198,15 @@ export default function ReviewAndSign({
     const pricingRaw = sessionStorage.getItem("pricing");
     const beneficiariesRaw = sessionStorage.getItem("beneficiaries");
     const paymentScheduleRaw = sessionStorage.getItem("paymentSchedule");
+    const signatureRaw = sessionStorage.getItem("signature");
 
     if (
       !confirmedLotsRaw ||
       !pricingRaw ||
       !mpIOwnerRaw ||
       !beneficiariesRaw ||
-      !paymentScheduleRaw
+      !paymentScheduleRaw ||
+      !signatureRaw
     ) {
       toastError("Missing sessionStorage data");
       return;
@@ -148,6 +217,9 @@ export default function ReviewAndSign({
     const mpIOwner = JSON.parse(mpIOwnerRaw);
     const beneficiaries = JSON.parse(beneficiariesRaw);
     const paymentSchedule = JSON.parse(paymentScheduleRaw);
+    const signature = signatureRaw;
+
+    const base64Only = signature.split("base64,")[1];
 
     const selectedLot = confirmedLots?.[0];
 
@@ -185,14 +257,17 @@ export default function ReviewAndSign({
 
       amt_contract: Number(pricing.contract.amtContract),
       date_sched_payment: paymentSchedule.fullDate,
+      signature: base64Only,
     };
 
     setSubmitted(true);
-    // console.log("Submitting with params:", params);
     try {
       const res = await PurchaseAgreementService.savePurchaseAgreement(params);
       toastSuccess("Purchase agreement saved successfully");
-      sessionStorage.clear();
+      setTimeout(() => {
+        sessionStorage.clear();
+        window.location.reload();
+      }, 300);
     } catch (err: any) {
       if (err.response) {
         toastError(
@@ -215,7 +290,40 @@ export default function ReviewAndSign({
       setPricing(JSON.parse(stored));
     }
   }, []);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
 
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.strokeStyle = "#000";
+  }, []);
+  useEffect(() => {
+    const savedSignature = sessionStorage.getItem("signature");
+
+    if (!savedSignature) return;
+
+    setSignature(savedSignature);
+    setIsSaved(true);
+    setIsDrawingDisabled(true);
+
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const img = new Image();
+    img.src = savedSignature;
+
+    img.onload = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    };
+  }, []);
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4">
       {checking && <Loading text="Saving purchase agreement.Please Wait!..." />}
@@ -383,6 +491,77 @@ export default function ReviewAndSign({
                 No payment schedule set.
               </p>
             )}
+          </div>
+
+          {/* Divider */}
+          <div className="border-t border-[#e8e3da]" />
+
+          {/* ── E-Signature */}
+          <div>
+            <SectionLabel>E-Signature</SectionLabel>
+
+            <div className="bg-[#f9f9f7] border border-[#e8e3da] rounded-[8px] p-3 flex flex-col gap-2">
+              <canvas
+                ref={canvasRef}
+                width={400}
+                height={150}
+                className={`w-full bg-white border border-dashed border-[#d6d3d1] rounded-md ${
+                  isDrawingDisabled ? "pointer-events-none opacity-60" : ""
+                }`}
+                onMouseDown={(e) => !isDrawingDisabled && startDrawing(e)}
+                onMouseMove={(e) => !isDrawingDisabled && draw(e)}
+                onMouseUp={stopDrawing}
+                onMouseLeave={stopDrawing}
+                onTouchStart={(e) => !isDrawingDisabled && startDrawing(e)}
+                onTouchMove={(e) => !isDrawingDisabled && draw(e)}
+                onTouchEnd={stopDrawing}
+              />
+
+              <div className="flex justify-between items-center">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const canvas = canvasRef.current;
+                    if (!canvas) return;
+
+                    const ctx = canvas.getContext("2d");
+                    if (!ctx) return;
+
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    setSignature(null);
+                    setIsSaved(false);
+                    setIsDrawingDisabled(false);
+
+                    sessionStorage.removeItem("signature");
+                  }}
+                  className="text-xs text-[#9a9a9a] hover:text-[#060503]"
+                >
+                  Clear
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSaveSignature}
+                  disabled={isSaved}
+                  className={`text-xs font-medium flex items-center gap-1 transition ${
+                    isSaved
+                      ? "text-green-600 cursor-not-allowed"
+                      : "text-[#b28648] hover:opacity-80"
+                  }`}
+                >
+                  {isSaved ? (
+                    <>
+                      Saved <Check size={16} />
+                    </>
+                  ) : (
+                    <>
+                      Save Signature <Check size={16} />
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
 
           {/* Divider */}
